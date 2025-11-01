@@ -28,11 +28,119 @@
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/responsive-pwa.css">
+    <link rel="stylesheet" href="css/dashboard-enhanced.css">
+    <link rel="stylesheet" href="css/sidebar-menu.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Overlay para cerrar sidebar en móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Botón hamburguesa para móvil -->
+    <button class="menu-toggle" id="menuToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <!-- Sidebar - Menú lateral -->
+    <aside class="app-sidebar" id="appSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">💰</div>
+                <div class="sidebar-logo-text">
+                    <h1>Finanzas</h1>
+                    <p>Control de gastos</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a class="sidebar-nav-item active" data-nav="registro">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+                <span class="nav-label">Registro</span>
+            </a>
+
+            <a class="sidebar-nav-item" data-nav="dashboard">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                <span class="nav-label">Dashboard</span>
+            </a>
+
+            <a class="sidebar-nav-item" data-nav="transacciones">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
+                <span class="nav-label">Transacciones</span>
+            </a>
+
+            <a class="sidebar-nav-item" data-nav="historial">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="nav-label">Historial</span>
+            </a>
+
+            <a class="sidebar-nav-item" data-nav="configuracion">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="nav-label">Configuración</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Bottom Navigation - Móvil -->
+    <nav class="bottom-nav" id="bottomNav">
+        <div class="bottom-nav-container">
+            <a class="bottom-nav-item active" data-nav="registro">
+                <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+                <span class="bottom-nav-label">Registro</span>
+            </a>
+
+            <a class="bottom-nav-item" data-nav="dashboard">
+                <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                <span class="bottom-nav-label">Dashboard</span>
+            </a>
+
+            <a class="bottom-nav-item" data-nav="transacciones">
+                <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
+                <span class="bottom-nav-label">Transacciones</span>
+            </a>
+
+            <a class="bottom-nav-item" data-nav="historial">
+                <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="bottom-nav-label">Historial</span>
+            </a>
+
+            <a class="bottom-nav-item" data-nav="configuracion">
+                <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="bottom-nav-label">Config</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="app-content">
     <!-- Header Global -->
     <header class="app-header">
         <div class="header-content">
@@ -75,7 +183,12 @@
                 <form id="registroForm">
                     <!-- Ingresos -->
                     <div class="form-section">
-                        <h3>💵 Ingresos del Mes</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 style="margin: 0;">💵 Ingresos del Mes</h3>
+                            <button type="button" id="btnAgregarIngreso" class="btn btn--primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                                ➕ Agregar Ingreso
+                            </button>
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="ingresoBase" class="form-label">Ingreso Principal *</label>
@@ -85,6 +198,12 @@
                                 <label for="ingresoExtra" class="form-label">Ingreso Extra</label>
                                 <input type="number" id="ingresoExtra" class="form-control" placeholder="$0" min="0">
                             </div>
+                        </div>
+                        <div id="ingresosAgregados" style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 0.5rem; display: none;">
+                            <p style="font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📊 Ingresos acumulados:</p>
+                            <p style="color: #6b7280; margin: 0;">
+                                <strong>Total de ingresos agregados:</strong> <span id="totalIngresosAcumulados" style="color: #059669; font-weight: 700;">$0</span>
+                            </p>
                         </div>
                     </div>
 
@@ -175,41 +294,120 @@
                 </div>
             </div>
 
+            <!-- Tarjetas de estadísticas principales -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-header">
-                        <h3>💰 Balance General</h3>
-                        <button class="toggle-details" data-card="balance">▼</button>
+                    <div class="stat-icon stat-icon-1">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z"/>
+                        </svg>
                     </div>
-                    <div class="stat-value" id="balanceGeneral">$0</div>
-                    <div class="stat-details" id="balanceDetails" style="display: none;">
-                        <p><strong>Ingresos totales:</strong> <span id="ingresosTotal">$0</span></p>
-                        <p><strong>Gastos totales:</strong> <span id="gastosTotal">$0</span></p>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <h3>💸 Total Gastado</h3>
-                        <button class="toggle-details" data-card="gastado">▼</button>
-                    </div>
-                    <div class="stat-value" id="totalGastado">$0</div>
-                    <div class="stat-details" id="gastadoDetails" style="display: none;">
-                        <div id="gastadoPorCategoria"></div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <h3>📈 Lo que te queda</h3>
-                        <button class="toggle-details" data-card="queda">▼</button>
-                    </div>
-                    <div class="stat-value" id="loQueQueda">$0</div>
-                    <div class="stat-details" id="quedaDetails" style="display: none;">
-                        <div id="progressBar" class="progress-bar">
-                            <div id="progressFill" class="progress-fill"></div>
+                    <div class="stat-content">
+                        <div class="stat-header">
+                            <h3>Balance General</h3>
+                            <button class="toggle-details" data-card="balance">▼</button>
                         </div>
-                        <p id="progressText">0% del presupuesto utilizado</p>
+                        <div class="stat-value" id="balanceGeneral">$0</div>
+                        <div class="stat-details" id="balanceDetails" style="display: none;">
+                            <p><strong>Ingresos totales:</strong> <span id="ingresosTotal">$0</span></p>
+                            <p><strong>Gastos totales:</strong> <span id="gastosTotal">$0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-2">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-header">
+                            <h3>Total Gastado</h3>
+                            <button class="toggle-details" data-card="gastado">▼</button>
+                        </div>
+                        <div class="stat-value" id="totalGastado">$0</div>
+                        <div class="stat-details" id="gastadoDetails" style="display: none;">
+                            <div id="gastadoPorCategoria"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-3">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                            <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-header">
+                            <h3>Lo que te queda</h3>
+                            <button class="toggle-details" data-card="queda">▼</button>
+                        </div>
+                        <div class="stat-value" id="loQueQueda">$0</div>
+                        <div class="stat-details" id="quedaDetails" style="display: none;">
+                            <div id="progressBar" class="progress-bar">
+                                <div id="progressFill" class="progress-fill"></div>
+                            </div>
+                            <p id="progressText">0% del presupuesto utilizado</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-4">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-header">
+                            <h3>Promedio Diario</h3>
+                            <button class="toggle-details" data-card="promedio">▼</button>
+                        </div>
+                        <div class="stat-value" id="promedioDiario">$0</div>
+                        <div class="stat-details" id="promedioDetails" style="display: none;">
+                            <p><strong>Días transcurridos:</strong> <span id="diasMes">0</span></p>
+                            <p><strong>Proyección mensual:</strong> <span id="proyeccionMensual">$0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-5">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                            <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-header">
+                            <h3>Categoría Principal</h3>
+                            <button class="toggle-details" data-card="categoria">▼</button>
+                        </div>
+                        <div class="stat-value" id="categoriaPrincipal" style="font-size: 1.5rem;">-</div>
+                        <div class="stat-details" id="categoriaDetails" style="display: none;">
+                            <p><strong>Monto gastado:</strong> <span id="montoCategoriaPrincipal">$0</span></p>
+                            <p><strong>Porcentaje del total:</strong> <span id="porcentajeCategoria">0%</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-6">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-header">
+                            <h3>Total de Transacciones</h3>
+                            <button class="toggle-details" data-card="transacciones">▼</button>
+                        </div>
+                        <div class="stat-value" id="totalTransacciones">0</div>
+                        <div class="stat-details" id="transaccionesDetails" style="display: none;">
+                            <p><strong>Transacción más alta:</strong> <span id="transaccionMaxima">$0</span></p>
+                            <p><strong>Transacción más baja:</strong> <span id="transaccionMinima">$0</span></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -217,7 +415,7 @@
             <!-- Recomendaciones Inteligentes -->
             <div id="smartInsightsContainer" class="insights-section" style="margin: 24px 0;"></div>
 
-            <!-- Gráficos -->
+            <!-- Gráficos principales -->
             <div class="charts-container">
                 <div class="chart-card">
                     <h3>📊 Gastos por Categoría</h3>
@@ -240,10 +438,24 @@
                     </div>
                 </div>
 
+                <div class="chart-card">
+                    <h3>📊 Balance de Gastos vs Ingresos</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartBalanceDoughnut"></canvas>
+                    </div>
+                </div>
+
                 <div class="chart-card full-width">
                     <h3>📊 Evolución Diaria de Gastos</h3>
                     <div class="chart-wrapper">
                         <canvas id="chartLine"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card full-width">
+                    <h3>📊 Comparación de Gastos por Usuario</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartUserComparison"></canvas>
                     </div>
                 </div>
             </div>
@@ -480,6 +692,13 @@
                             </button>
                         </div>
                     </div>
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label class="form-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="rememberMe" style="width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #374151;">Recordar datos y mantener sesión iniciada</span>
+                        </label>
+                        <p style="font-size: 12px; color: #6b7280; margin: 8px 0 0 26px;">Tus datos se guardarán de forma segura en este dispositivo</p>
+                    </div>
                     <button type="submit" class="btn btn--primary btn--full-width">Iniciar Sesión</button>
                     <button type="button" id="continueAnonymous" class="btn btn--secondary btn--full-width" style="margin-top: 12px;">
                         Continuar sin cuenta
@@ -514,6 +733,13 @@
                             </button>
                         </div>
                     </div>
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label class="form-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="rememberMeRegister" checked style="width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #374151;">Recordar datos y mantener sesión iniciada</span>
+                        </label>
+                        <p style="font-size: 12px; color: #6b7280; margin: 8px 0 0 26px;">Tus datos se guardarán de forma segura en este dispositivo</p>
+                    </div>
                     <button type="submit" class="btn btn--primary btn--full-width">Crear Cuenta</button>
                 </form>
             </div>
@@ -525,6 +751,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/sidebar-navigation.js"></script>
     <script type="module" src="js/currency-notifications.js"></script>
     <script type="module" src="js/integration.js"></script>
     <script type="module" src="firebase-config.js"></script>
@@ -605,5 +832,7 @@
         window.addEventListener('offline', updateOnlineStatus);
         window.addEventListener('load', updateOnlineStatus);
     </script>
+    </div>
+    <!-- Fin app-content -->
 </body>
 </html>

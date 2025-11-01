@@ -135,9 +135,16 @@ async function loadAppData() {
 function initializeDefaultData() {
   if (appData.usuarios.length === 0) {
     appData.usuarios = [
-      { id: 1, nombre: 'Daniel', foto: '', ingresoBase: 0, ingresoExtra: 0 },
-      { id: 2, nombre: 'Pareja', foto: '', ingresoBase: 0, ingresoExtra: 0 }
+      { id: 1, nombre: 'Daniel', foto: '', ingresoBase: 0, ingresoExtra: 0, ingresosAcumulados: 0 },
+      { id: 2, nombre: 'Pareja', foto: '', ingresoBase: 0, ingresoExtra: 0, ingresosAcumulados: 0 }
     ];
+  } else {
+    // Asegurar que usuarios existentes tengan el campo ingresosAcumulados
+    appData.usuarios.forEach(usuario => {
+      if (usuario.ingresosAcumulados === undefined) {
+        usuario.ingresosAcumulados = 0;
+      }
+    });
   }
 
   if (appData.categorias.length === 0) {
@@ -255,6 +262,9 @@ function setupEventListeners() {
   // Actualizar ingresos base y extra
   document.getElementById('ingresoBase').addEventListener('change', actualizarIngresos);
   document.getElementById('ingresoExtra').addEventListener('change', actualizarIngresos);
+
+  // Botón agregar ingreso
+  document.getElementById('btnAgregarIngreso').addEventListener('click', agregarIngreso);
 
   // Event delegation para botones de acciones en transacciones
   document.getElementById('transaccionesBody').addEventListener('click', function(e) {
@@ -445,7 +455,7 @@ function handleRegistroSubmit(e) {
 function actualizarIngresos() {
   const ingresoBase = parseFloat(document.getElementById('ingresoBase').value) || 0;
   const ingresoExtra = parseFloat(document.getElementById('ingresoExtra').value) || 0;
-  
+
   const usuario = appData.usuarios.find(u => u.id === appData.usuarioActual);
   if (usuario) {
     usuario.ingresoBase = ingresoBase;
@@ -453,6 +463,43 @@ function actualizarIngresos() {
     saveAppData();
     updateUI();
   }
+}
+
+function agregarIngreso() {
+  const ingresoBase = parseFloat(document.getElementById('ingresoBase').value) || 0;
+  const ingresoExtra = parseFloat(document.getElementById('ingresoExtra').value) || 0;
+
+  if (ingresoBase === 0 && ingresoExtra === 0) {
+    showToast('Debes ingresar al menos un monto', 'error');
+    return;
+  }
+
+  const usuario = appData.usuarios.find(u => u.id === appData.usuarioActual);
+  if (!usuario) {
+    showToast('Usuario no encontrado', 'error');
+    return;
+  }
+
+  // Sumar los ingresos al acumulado
+  const totalNuevoIngreso = ingresoBase + ingresoExtra;
+  usuario.ingresosAcumulados = (usuario.ingresosAcumulados || 0) + totalNuevoIngreso;
+
+  // Limpiar los campos
+  document.getElementById('ingresoBase').value = '';
+  document.getElementById('ingresoExtra').value = '';
+
+  // Actualizar usuario
+  usuario.ingresoBase = 0;
+  usuario.ingresoExtra = 0;
+
+  // Mostrar el panel de ingresos acumulados
+  const panelAcumulados = document.getElementById('ingresosAgregados');
+  panelAcumulados.style.display = 'block';
+  document.getElementById('totalIngresosAcumulados').textContent = formatCLP(usuario.ingresosAcumulados);
+
+  saveAppData();
+  updateUI();
+  showToast(`Ingreso de ${formatCLP(totalNuevoIngreso)} agregado correctamente`, 'success');
 }
 
 function limpiarFormulario() {
@@ -661,25 +708,53 @@ function updateDashboard() {
 
     // Calcular totales
     const transaccionesMes = appData.transacciones.filter(t => t.mes === getCurrentMonth());
-    const totalIngresos = usuario.ingresoBase + usuario.ingresoExtra;
+    const totalIngresos = usuario.ingresoBase + usuario.ingresoExtra + (usuario.ingresosAcumulados || 0);
     const totalGastos = transaccionesMes.reduce((sum, t) => sum + t.monto, 0);
     const balance = totalIngresos - totalGastos;
 
-    // Actualizar tarjetas
+    // Actualizar tarjetas básicas
     document.getElementById('balanceGeneral').textContent = formatCLP(balance);
     document.getElementById('ingresosTotal').textContent = formatCLP(totalIngresos);
     document.getElementById('gastosTotal').textContent = formatCLP(totalGastos);
     document.getElementById('totalGastado').textContent = formatCLP(totalGastos);
     document.getElementById('loQueQueda').textContent = formatCLP(balance);
 
-    // Actualizar detalles de gastos por categoría
-    const gastadoPorCategoria = document.getElementById('gastadoPorCategoria');
-    gastadoPorCategoria.innerHTML = '';
+    // Actualizar promedio diario
+    const diasMes = new Date().getDate();
+    const promedioDiario = diasMes > 0 ? totalGastos / diasMes : 0;
+    const diasEnMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    const proyeccion = promedioDiario * diasEnMes;
+
+    document.getElementById('promedioDiario').textContent = formatCLP(promedioDiario);
+    document.getElementById('diasMes').textContent = diasMes;
+    document.getElementById('proyeccionMensual').textContent = formatCLP(proyeccion);
+
+    // Actualizar categoría principal
     const categoriasSums = {};
     transaccionesMes.forEach(t => {
       if (!categoriasSums[t.categoria]) categoriasSums[t.categoria] = 0;
       categoriasSums[t.categoria] += t.monto;
     });
+
+    const categoriaPrincipal = Object.entries(categoriasSums).sort((a, b) => b[1] - a[1])[0];
+    if (categoriaPrincipal) {
+      document.getElementById('categoriaPrincipal').textContent = categoriaPrincipal[0];
+      document.getElementById('montoCategoriaPrincipal').textContent = formatCLP(categoriaPrincipal[1]);
+      const porcentaje = (categoriaPrincipal[1] / totalGastos * 100).toFixed(1);
+      document.getElementById('porcentajeCategoria').textContent = porcentaje + '%';
+    }
+
+    // Actualizar total de transacciones
+    document.getElementById('totalTransacciones').textContent = transaccionesMes.length;
+    if (transaccionesMes.length > 0) {
+      const montos = transaccionesMes.map(t => t.monto);
+      document.getElementById('transaccionMaxima').textContent = formatCLP(Math.max(...montos));
+      document.getElementById('transaccionMinima').textContent = formatCLP(Math.min(...montos));
+    }
+
+    // Actualizar detalles de gastos por categoría
+    const gastadoPorCategoria = document.getElementById('gastadoPorCategoria');
+    gastadoPorCategoria.innerHTML = '';
     Object.entries(categoriasSums).forEach(([cat, sum]) => {
       const p = document.createElement('p');
       p.innerHTML = `<strong>${sanitizeHTML(cat)}:</strong> ${formatCLP(sum)}`;
@@ -816,6 +891,77 @@ function initializeCharts() {
       }
     }
   });
+
+  // Gráfico de Balance (Doughnut)
+  const ctxBalance = document.getElementById('chartBalanceDoughnut');
+  if (ctxBalance) {
+    chartInstances.balanceDoughnut = new Chart(ctxBalance, {
+      type: 'doughnut',
+      data: {
+        labels: ['Gastado', 'Disponible'],
+        datasets: [{
+          data: [0, 100],
+          backgroundColor: [colors[2], colors[0]],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                return `${label}: ${formatCLP(value)}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Gráfico de comparación por usuario
+  const ctxUserComp = document.getElementById('chartUserComparison');
+  if (ctxUserComp) {
+    chartInstances.userComparison = new Chart(ctxUserComp, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Gastos por Usuario',
+          data: [],
+          backgroundColor: colors,
+          borderColor: colors.map(c => c.replace('0.8', '1')),
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return formatCLP(value);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 }
 
 function updateCharts(transacciones) {
@@ -830,7 +976,7 @@ function updateCharts(transacciones) {
     if (!transacciones || transacciones.length === 0) {
       chartInstances.pie.data.labels = [];
       chartInstances.pie.data.datasets[0].data = [];
-      chartInstances.pie.update('none'); // 'none' evita animaciones innecesarias
+      chartInstances.pie.update('none');
 
       chartInstances.bar.data.datasets[0].data = [0, 0];
       chartInstances.bar.update('none');
@@ -842,6 +988,17 @@ function updateCharts(transacciones) {
       chartInstances.line.data.labels = [];
       chartInstances.line.data.datasets[0].data = [];
       chartInstances.line.update('none');
+
+      if (chartInstances.balanceDoughnut) {
+        chartInstances.balanceDoughnut.data.datasets[0].data = [0, 100];
+        chartInstances.balanceDoughnut.update('none');
+      }
+
+      if (chartInstances.userComparison) {
+        chartInstances.userComparison.data.labels = [];
+        chartInstances.userComparison.data.datasets[0].data = [];
+        chartInstances.userComparison.update('none');
+      }
       return;
     }
 
@@ -881,6 +1038,30 @@ function updateCharts(transacciones) {
     chartInstances.line.data.labels = sortedDates;
     chartInstances.line.data.datasets[0].data = sortedDates.map(d => diasSums[d]);
     chartInstances.line.update('none');
+
+    // Gráfico de balance (Doughnut) - Gastos vs Disponible
+    if (chartInstances.balanceDoughnut) {
+      const usuario = appData.usuarios.find(u => u.id === appData.usuarioActual);
+      const totalIngresos = usuario ? (usuario.ingresoBase + usuario.ingresoExtra + (usuario.ingresosAcumulados || 0)) : 0;
+      const totalGastos = transacciones.reduce((sum, t) => sum + t.monto, 0);
+      const disponible = Math.max(0, totalIngresos - totalGastos);
+
+      chartInstances.balanceDoughnut.data.datasets[0].data = [totalGastos, disponible];
+      chartInstances.balanceDoughnut.update('none');
+    }
+
+    // Gráfico de comparación por usuario
+    if (chartInstances.userComparison) {
+      const usuariosSums = {};
+      transacciones.forEach(t => {
+        if (!usuariosSums[t.usuario]) usuariosSums[t.usuario] = 0;
+        usuariosSums[t.usuario] += t.monto;
+      });
+
+      chartInstances.userComparison.data.labels = Object.keys(usuariosSums);
+      chartInstances.userComparison.data.datasets[0].data = Object.values(usuariosSums);
+      chartInstances.userComparison.update('none');
+    }
   } catch (error) {
     console.error('Error al actualizar gráficos:', error);
   }
@@ -1263,6 +1444,15 @@ function updateUI() {
   if (usuario) {
     document.getElementById('ingresoBase').value = usuario.ingresoBase || '';
     document.getElementById('ingresoExtra').value = usuario.ingresoExtra || '';
+
+    // Mostrar panel de ingresos acumulados si hay ingresos
+    const panelAcumulados = document.getElementById('ingresosAgregados');
+    if (usuario.ingresosAcumulados && usuario.ingresosAcumulados > 0) {
+      panelAcumulados.style.display = 'block';
+      document.getElementById('totalIngresosAcumulados').textContent = formatCLP(usuario.ingresosAcumulados);
+    } else {
+      panelAcumulados.style.display = 'none';
+    }
   }
 }
 
@@ -1288,6 +1478,9 @@ function showAuthModal() {
       document.getElementById(`${tabName}Form`).classList.add('active');
     });
   });
+
+  // Cargar credenciales guardadas si existen
+  loadSavedCredentials();
 
   // Form de login
   document.getElementById('loginForm').addEventListener('submit', handleLogin);
@@ -1328,11 +1521,57 @@ function hideAuthModal() {
   document.getElementById('authModal').classList.remove('active');
 }
 
+function loadSavedCredentials() {
+  try {
+    const savedCreds = localStorage.getItem('rememberedCredentials');
+    if (savedCreds) {
+      const { email, rememberMe } = JSON.parse(savedCreds);
+      document.getElementById('loginEmail').value = email;
+      document.getElementById('rememberMe').checked = rememberMe;
+    }
+
+    // Si hay una sesión guardada, intentar login automático
+    const autoLogin = localStorage.getItem('autoLogin');
+    if (autoLogin === 'true') {
+      const savedEmail = localStorage.getItem('userEmail');
+      if (savedEmail) {
+        // Ocultar modal y cargar datos directamente
+        setTimeout(() => {
+          hideAuthModal();
+          initializeAppAfterAuth();
+        }, 500);
+      }
+    }
+  } catch (error) {
+    console.error('Error al cargar credenciales guardadas:', error);
+  }
+}
+
+function saveCredentials(email, rememberMe) {
+  try {
+    if (rememberMe) {
+      localStorage.setItem('rememberedCredentials', JSON.stringify({
+        email,
+        rememberMe: true
+      }));
+      localStorage.setItem('autoLogin', 'true');
+      localStorage.setItem('userEmail', email);
+    } else {
+      localStorage.removeItem('rememberedCredentials');
+      localStorage.removeItem('autoLogin');
+      localStorage.removeItem('userEmail');
+    }
+  } catch (error) {
+    console.error('Error al guardar credenciales:', error);
+  }
+}
+
 async function handleLogin(e) {
   e.preventDefault();
 
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
+  const rememberMe = document.getElementById('rememberMe').checked;
 
   if (!email || !password) {
     showToast('Completa todos los campos', 'error');
@@ -1344,6 +1583,9 @@ async function handleLogin(e) {
   const result = await loginWithEmail(email, password);
 
   if (result.success) {
+    // Guardar credenciales si el usuario lo solicita
+    saveCredentials(email, rememberMe);
+
     showToast('¡Bienvenido de nuevo!', 'success');
     hideAuthModal();
     await initializeAppAfterAuth();
@@ -1359,6 +1601,7 @@ async function handleRegister(e) {
   const email = document.getElementById('registerEmail').value.trim();
   const password = document.getElementById('registerPassword').value;
   const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+  const rememberMe = document.getElementById('rememberMeRegister').checked;
 
   if (!name || !email || !password || !passwordConfirm) {
     showToast('Completa todos los campos', 'error');
@@ -1380,6 +1623,9 @@ async function handleRegister(e) {
   const result = await registerWithEmail(email, password, name);
 
   if (result.success) {
+    // Guardar credenciales si el usuario lo solicita
+    saveCredentials(email, rememberMe);
+
     showToast(`¡Bienvenido ${name}!`, 'success');
     hideAuthModal();
     await initializeAppAfterAuth();

@@ -1,0 +1,490 @@
+/* ============================================
+   ESTILOS RESPONSIVE Y PWA
+   ============================================ */
+
+/* ============================================
+   1. MEJORAS DE RESPONSIVIDAD
+   ============================================ */
+
+/* Contenedor principal adaptable */
+.app-content {
+  min-height: calc(100vh - 200px);
+  padding: 16px;
+}
+
+@media (max-width: 768px) {
+  .app-content {
+    padding: 12px;
+  }
+
+  .app-header {
+    padding: 12px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .header-left, .header-right {
+    width: 100%;
+  }
+}
+
+/* Navegación responsive */
+.app-nav {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.app-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.app-nav .nav-tab {
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+@media (max-width: 640px) {
+  .app-nav {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .nav-tab {
+    font-size: 13px;
+    padding: 8px 12px !important;
+  }
+}
+
+/* Stats Grid Responsive */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Charts Container Responsive */
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Formularios responsive */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Filtros responsive */
+.filters-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .filters-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .filters-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filter-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Tabla responsive */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
+@media (max-width: 768px) {
+  .transactions-table {
+    font-size: 13px;
+  }
+
+  .transactions-table th,
+  .transactions-table td {
+    padding: 8px;
+    white-space: nowrap;
+  }
+}
+
+/* Botones responsive */
+.btn {
+  min-height: 44px; /* Tamaño táctil mínimo */
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .btn--full-width-mobile {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   2. ESTILOS PARA INSIGHTS/RECOMENDACIONES
+   ============================================ */
+
+.insights-section {
+  width: 100%;
+  margin: 24px 0;
+}
+
+.insights-container {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.insights-container h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.insight-card {
+  animation: slideInUp 0.3s ease-out;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .insights-container {
+    padding: 16px;
+    margin: 0 -12px;
+    border-radius: 0;
+  }
+
+  .insight-card {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   3. ESTILOS PARA NOTIFICACIONES
+   ============================================ */
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #1f2937;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  max-width: 400px;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+@media (max-width: 640px) {
+  .toast {
+    left: 20px;
+    right: 20px;
+    bottom: 16px;
+    max-width: none;
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   4. MEJORAS PWA
+   ============================================ */
+
+/* Botón de instalación PWA */
+.install-pwa-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: #1E3A8A;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.install-pwa-btn:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(30, 58, 138, 0.4);
+}
+
+.install-pwa-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .install-pwa-btn {
+    bottom: 70px;
+    right: 16px;
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}
+
+/* Indicador de estado online/offline */
+.online-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.online-status-indicator.online {
+  color: #10b981;
+}
+
+.online-status-indicator.offline {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ============================================
+   5. MEJORAS DE ACCESIBILIDAD
+   ============================================ */
+
+/* Mejorar contraste de foco */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Mejorar área táctil de elementos interactivos */
+button, a, input[type="checkbox"], input[type="radio"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Texto más legible */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   6. ANIMACIONES Y TRANSICIONES
+   ============================================ */
+
+/* Transiciones suaves para cambios de tab */
+.tab-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(0,0,0,0.1);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ============================================
+   7. UTILIDADES RESPONSIVE
+   ============================================ */
+
+/* Ocultar en mobile */
+@media (max-width: 640px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Mostrar solo en mobile */
+.show-mobile {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .show-mobile {
+    display: block !important;
+  }
+}
+
+/* Stack en mobile */
+@media (max-width: 640px) {
+  .stack-mobile {
+    flex-direction: column !important;
+  }
+}
+
+/* ============================================
+   8. MEJORAS DE RENDIMIENTO
+   ============================================ */
+
+/* Optimizar animaciones para dispositivos móviles */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Lazy loading de imágenes */
+img[loading="lazy"] {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* ============================================
+   9. SAFE AREA (iPhone notch, etc)
+   ============================================ */
+
+@supports (padding: max(0px)) {
+  .app-header {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+
+  .floating-btn {
+    bottom: max(20px, env(safe-area-inset-bottom));
+    right: max(20px, env(safe-area-inset-right));
+  }
+
+  .toast {
+    bottom: max(20px, env(safe-area-inset-bottom));
+  }
+}
+
+/* ============================================
+   10. DARK MODE ADICIONAL
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .insights-container {
+    background: #1f2937;
+  }
+
+  .insight-card {
+    background: #374151 !important;
+  }
+
+  .insight-card h4 {
+    color: #f9fafb !important;
+  }
+
+  .insight-card p {
+    color: #d1d5db !important;
+  }
+
+  .toast {
+    background: #374151;
+  }
+}

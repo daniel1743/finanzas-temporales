@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Primary Meta Tags -->
+    <title>💰 Finanzas Mensuales - Control de Gastos</title>
+    <meta name="title" content="💰 Finanzas Mensuales - Control de Gastos">
+    <meta name="description" content="Control completo de tus finanzas personales. Gestiona ingresos, gastos y visualiza estadísticas en tiempo real.">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1E3A8A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Finanzas">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="public/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="public/icon-512.png">
+    <link rel="apple-touch-icon" href="public/icon-192.png">
+    <link rel="shortcut icon" href="public/icon-192.png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/responsive-pwa.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Global -->
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1 class="app-title">💰 Finanzas Mensuales</h1>
+                <p class="app-subtitle">Control completo de tus finanzas personales</p>
+            </div>
+            <div class="header-right">
+                <div class="user-selector">
+                    <label for="currentUser">Usuario:</label>
+                    <select id="currentUser" class="form-control">
+                        <option value="1">Daniel</option>
+                        <option value="2">Pareja</option>
+                        <option value="new">+ Agregar nuevo usuario</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="app-nav">
+        <button class="nav-tab active" data-tab="registro">📝 Registro</button>
+        <button class="nav-tab" data-tab="dashboard">📊 Dashboard</button>
+        <button class="nav-tab" data-tab="transacciones">💳 Transacciones</button>
+        <button class="nav-tab" data-tab="historial">📜 Historial</button>
+        <button class="nav-tab" data-tab="configuracion">⚙️ Configuración</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="app-content">
+        <!-- Tab 1: REGISTRO -->
+        <section id="registro" class="tab-content active">
+            <div class="section-header">
+                <h2>💰 Registro de Gastos e Ingresos</h2>
+                <p>Lleva el control de tus finanzas de manera sencilla y rápida.</p>
+            </div>
+
+            <div class="form-container">
+                <form id="registroForm">
+                    <!-- Ingresos -->
+                    <div class="form-section">
+                        <h3>💵 Ingresos del Mes</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ingresoBase" class="form-label">Ingreso Principal *</label>
+                                <input type="number" id="ingresoBase" class="form-control" placeholder="$0" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="ingresoExtra" class="form-label">Ingreso Extra</label>
+                                <input type="number" id="ingresoExtra" class="form-control" placeholder="$0" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gastos -->
+                    <div class="form-section">
+                        <h3>💸 Registrar Gasto</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="montoGasto" class="form-label">Monto del Gasto *</label>
+                                <input type="number" id="montoGasto" class="form-control" placeholder="$0" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="descripcionGasto" class="form-label">Descripción *</label>
+                                <input type="text" id="descripcionGasto" class="form-control" placeholder="Ej: Supermercado" list="descripcionesSugeridasPrincipal" autocomplete="off" required>
+                                <datalist id="descripcionesSugeridasPrincipal"></datalist>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="categoria" class="form-label">Categoría *</label>
+                                <select id="categoria" class="form-control" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Alimentación 🍞">Alimentación 🍞</option>
+                                    <option value="Transporte 🚗">Transporte 🚗</option>
+                                    <option value="Entretenimiento 🎬">Entretenimiento 🎬</option>
+                                    <option value="Salud 💊">Salud 💊</option>
+                                    <option value="Educación 📚">Educación 📚</option>
+                                    <option value="Otro ➕">Otro ➕</option>
+                                    <option value="nueva">+ Agregar nueva categoría</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="fechaGasto" class="form-label">Fecha *</label>
+                                <input type="date" id="fechaGasto" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Nivel de Necesidad *</label>
+                            <div class="necessity-buttons">
+                                <button type="button" class="necessity-btn" data-level="Baja">Baja</button>
+                                <button type="button" class="necessity-btn" data-level="Media">Media</button>
+                                <button type="button" class="necessity-btn" data-level="Alta">Alta</button>
+                                <button type="button" class="necessity-btn" data-level="Crítica">Crítica</button>
+                                <button type="button" class="necessity-btn-add" id="addNecesidad">+ Agregar personalizada</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usuarioGasto" class="form-label">Usuario *</label>
+                            <select id="usuarioGasto" class="form-control" required>
+                                <option value="Daniel">Daniel</option>
+                                <option value="Pareja">Pareja</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="items" class="form-label">Items de compra (opcional)</label>
+                            <textarea id="items" class="form-control" rows="3" placeholder="Ej: Arroz, Aceite, Pan..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notas" class="form-label">Notas adicionales (opcional)</label>
+                            <textarea id="notas" class="form-control" rows="3" placeholder="Cualquier información adicional..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--primary">Registrar Gasto</button>
+                        <button type="button" id="limpiarForm" class="btn btn--secondary">Limpiar Campos</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Tab 2: DASHBOARD -->
+        <section id="dashboard" class="tab-content">
+            <div class="dashboard-header">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <img id="userAvatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%231E3A8A'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='32' font-family='Arial'%3E👤%3C/text%3E%3C/svg%3E" alt="Usuario">
+                    </div>
+                    <div class="user-info">
+                        <h2 id="userGreeting">Hola, Usuario 👋</h2>
+                        <p id="monthInfo">Tus finanzas de octubre van así:</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>💰 Balance General</h3>
+                        <button class="toggle-details" data-card="balance">▼</button>
+                    </div>
+                    <div class="stat-value" id="balanceGeneral">$0</div>
+                    <div class="stat-details" id="balanceDetails" style="display: none;">
+                        <p><strong>Ingresos totales:</strong> <span id="ingresosTotal">$0</span></p>
+                        <p><strong>Gastos totales:</strong> <span id="gastosTotal">$0</span></p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>💸 Total Gastado</h3>
+                        <button class="toggle-details" data-card="gastado">▼</button>
+                    </div>
+                    <div class="stat-value" id="totalGastado">$0</div>
+                    <div class="stat-details" id="gastadoDetails" style="display: none;">
+                        <div id="gastadoPorCategoria"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>📈 Lo que te queda</h3>
+                        <button class="toggle-details" data-card="queda">▼</button>
+                    </div>
+                    <div class="stat-value" id="loQueQueda">$0</div>
+                    <div class="stat-details" id="quedaDetails" style="display: none;">
+                        <div id="progressBar" class="progress-bar">
+                            <div id="progressFill" class="progress-fill"></div>
+                        </div>
+                        <p id="progressText">0% del presupuesto utilizado</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recomendaciones Inteligentes -->
+            <div id="smartInsightsContainer" class="insights-section" style="margin: 24px 0;"></div>
+
+            <!-- Gráficos -->
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>📊 Gastos por Categoría</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartPie"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>📊 Gastos Necesarios vs Innecesarios</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartBar"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>📊 Nivel de Necesidad</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartRadar"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card full-width">
+                    <h3>📊 Evolución Diaria de Gastos</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartLine"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 3: TRANSACCIONES -->
+        <section id="transacciones" class="tab-content">
+            <div class="section-header">
+                <h2>💳 Transacciones</h2>
+                <p>Lista completa y filtrable de todas tus transacciones</p>
+            </div>
+
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label>Fecha desde:</label>
+                    <input type="date" id="filterFechaDesde" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label>Fecha hasta:</label>
+                    <input type="date" id="filterFechaHasta" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label>Monto mínimo:</label>
+                    <input type="number" id="filterMontoMin" class="form-control" placeholder="$0">
+                </div>
+                <div class="filter-group">
+                    <label>Monto máximo:</label>
+                    <input type="number" id="filterMontoMax" class="form-control" placeholder="$0">
+                </div>
+                <div class="filter-group">
+                    <label>Categoría:</label>
+                    <select id="filterCategoria" class="form-control">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Usuario:</label>
+                    <select id="filterUsuario" class="form-control">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button id="aplicarFiltros" class="btn btn--primary btn--sm">Aplicar Filtros</button>
+                    <button id="limpiarFiltros" class="btn btn--secondary btn--sm">Limpiar</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="transaccionesTable" class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Usuario</th>
+                            <th>Descripción</th>
+                            <th>Categoría</th>
+                            <th>Necesidad</th>
+                            <th>Monto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transaccionesBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">No hay transacciones registradas</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tab 4: HISTORIAL -->
+        <section id="historial" class="tab-content">
+            <div class="section-header">
+                <h2>📜 Historial</h2>
+                <p>Histórico completo de tus finanzas</p>
+            </div>
+
+            <div class="history-section">
+                <h3>📅 Mes Actual</h3>
+                <div id="mesActualContent" class="history-content">
+                    <p class="no-data">No hay datos del mes actual</p>
+                </div>
+                <div id="resumenActual" class="history-summary"></div>
+            </div>
+
+            <div class="history-section">
+                <h3>📅 Mes Anterior</h3>
+                <div id="mesAnteriorContent" class="history-content">
+                    <p class="no-data">No hay datos del mes anterior</p>
+                </div>
+                <div id="resumenAnterior" class="history-summary"></div>
+            </div>
+
+            <div class="export-section">
+                <button id="exportarCSV" class="btn btn--primary">📥 Exportar Historial a CSV</button>
+            </div>
+        </section>
+
+        <!-- Tab 5: CONFIGURACIÓN -->
+        <section id="configuracion" class="tab-content">
+            <div class="section-header">
+                <h2>⚙️ Configuración</h2>
+                <p>Personaliza tu experiencia</p>
+            </div>
+
+            <div class="config-container">
+                <div class="config-section">
+                    <h3>👤 Perfil de Usuario</h3>
+                    <div class="form-group">
+                        <label class="form-label">Foto de perfil</label>
+                        <input type="file" id="uploadFoto" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" id="configNombre" class="form-control" placeholder="Tu nombre">
+                    </div>
+                    <button id="guardarPerfil" class="btn btn--primary">Guardar Perfil</button>
+                </div>
+
+                <div class="config-section">
+                    <h3>🔔 Notificaciones</h3>
+                    <p>Configura recordatorios para registrar tus gastos diarios</p>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="enableNotifications" style="margin-right: 8px;">
+                            Habilitar notificaciones diarias
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hora del recordatorio</label>
+                        <input type="time" id="reminderTime" class="form-control" value="20:00">
+                    </div>
+                    <button id="saveNotificationSettings" class="btn btn--primary">Guardar Configuración</button>
+                    <button id="testNotification" class="btn btn--secondary" style="margin-left: 8px;">Probar Notificación</button>
+                </div>
+
+                <div class="config-section">
+                    <h3>💱 Moneda</h3>
+                    <p><strong>Moneda actual:</strong> Peso Chileno (CLP)</p>
+                    <p style="color: #6b7280; font-size: 14px;">Todos los montos se muestran en formato chileno: $1.500</p>
+                </div>
+
+                <div class="config-section">
+                    <h3>🗑️ Gestión de Datos</h3>
+                    <p>Esta acción eliminará todos los datos almacenados. No se puede deshacer.</p>
+                    <button id="reiniciarDatos" class="btn btn--outline">Reiniciar Todos los Datos</button>
+                </div>
+
+                <div class="config-section">
+                    <h3>ℹ️ Información</h3>
+                    <p><strong>Versión:</strong> 1.0.0</p>
+                    <p><strong>Almacenamiento:</strong> <span id="storageInfo">Calculando...</span></p>
+                    <p><strong>Última actualización:</strong> Noviembre 2025</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Botón Flotante -->
+    <button id="btnFlotante" class="floating-btn" title="Agregar gasto rápido">
+        <span>+</span>
+    </button>
+
+    <!-- Modal para gasto rápido -->
+    <div id="modalRapido" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalRapidoTitle">➕ Agregar Gasto Rápido</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="gastoRapidoForm">
+                    <input type="hidden" id="transaccionIdRapido">
+                    <div class="form-group">
+                        <label class="form-label">Monto *</label>
+                        <input type="number" id="montoRapido" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descripción *</label>
+                        <input type="text" id="descripcionRapido" class="form-control" list="descripcionesSugeridas" autocomplete="off" required>
+                        <datalist id="descripcionesSugeridas"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Categoría *</label>
+                        <select id="categoriaRapido" class="form-control" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="Alimentación 🍞">Alimentación 🍞</option>
+                            <option value="Transporte 🚗">Transporte 🚗</option>
+                            <option value="Entretenimiento 🎬">Entretenimiento 🎬</option>
+                            <option value="Salud 💊">Salud 💊</option>
+                            <option value="Educación 📚">Educación 📚</option>
+                            <option value="Otro ➕">Otro ➕</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="esGastoRapido" checked style="margin-right: 8px;">
+                            <span style="font-size: 12px; color: var(--color-text-secondary);">Marcar como gasto rápido (editable después)</span>
+                        </label>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn--primary btn--full-width" id="btnGuardarRapido">Agregar Gasto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Autenticación -->
+    <div id="authModal" class="modal auth-modal">
+        <div class="modal-content auth-modal-content">
+            <div class="auth-modal-header">
+                <h2 id="authModalTitle">🔐 Bienvenido</h2>
+                <p id="authModalSubtitle">Inicia sesión o crea una cuenta para sincronizar tus datos</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-auth-tab="login">Iniciar Sesión</button>
+                <button class="auth-tab" data-auth-tab="register">Registrarse</button>
+            </div>
+
+            <div class="auth-modal-body">
+                <!-- Formulario de Login -->
+                <form id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password" data-target="loginPassword" title="Mostrar contraseña">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Iniciar Sesión</button>
+                    <button type="button" id="continueAnonymous" class="btn btn--secondary btn--full-width" style="margin-top: 12px;">
+                        Continuar sin cuenta
+                    </button>
+                </form>
+
+                <!-- Formulario de Registro -->
+                <form id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" id="registerName" class="form-control" placeholder="Tu nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" id="registerEmail" class="form-control" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="registerPassword" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6">
+                            <button type="button" class="toggle-password" data-target="registerPassword" title="Mostrar contraseña">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirmar Contraseña</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="registerPasswordConfirm" class="form-control" placeholder="Repite tu contraseña" required>
+                            <button type="button" class="toggle-password" data-target="registerPasswordConfirm" title="Mostrar contraseña">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Crear Cuenta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="js/currency-notifications.js"></script>
+    <script type="module" src="js/integration.js"></script>
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="app.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Registro del Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registrado:', registration.scope);
+
+                        // Verificar actualizaciones periódicamente
+                        setInterval(() => {
+                            registration.update();
+                        }, 60000); // Cada minuto
+                    })
+                    .catch(error => {
+                        console.error('❌ Error al registrar Service Worker:', error);
+                    });
+            });
+
+            // Detectar cuando hay una nueva versión disponible
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                console.log('🔄 Nueva versión disponible');
+                // Opcional: Mostrar notificación al usuario
+                if (confirm('Hay una nueva versión disponible. ¿Deseas actualizar?')) {
+                    window.location.reload();
+                }
+            });
+        }
+
+        // Prompt de instalación de PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Mostrar botón de instalación personalizado si existe
+            const installBtn = document.getElementById('installPWABtn');
+            if (installBtn) {
+                installBtn.style.display = 'block';
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`Usuario eligió: ${outcome}`);
+                        deferredPrompt = null;
+                        installBtn.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        // Detectar cuando la app fue instalada
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA instalada exitosamente');
+            deferredPrompt = null;
+        });
+
+        // Detectar estado de conexión
+        function updateOnlineStatus() {
+            const statusElement = document.getElementById('onlineStatus');
+            if (statusElement) {
+                if (navigator.onLine) {
+                    statusElement.textContent = '🟢 Online';
+                    statusElement.style.color = '#10b981';
+                } else {
+                    statusElement.textContent = '🔴 Offline';
+                    statusElement.style.color = '#ef4444';
+                }
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        window.addEventListener('load', updateOnlineStatus);
+    </script>
+</body>
+</html>

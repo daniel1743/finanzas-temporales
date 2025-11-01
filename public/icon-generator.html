@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Iconos PWA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 20px 0;
+            display: none;
+        }
+        button {
+            background: #1E3A8A;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #1e40af;
+        }
+        .icon-preview {
+            display: inline-block;
+            margin: 10px;
+        }
+        .icon-preview img {
+            display: block;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>💰 Generador de Iconos PWA</h1>
+    <p>Haz clic en el botón para generar todos los iconos necesarios</p>
+
+    <button onclick="generateAllIcons()">Generar Iconos</button>
+
+    <div id="preview"></div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        function generateIcon(size) {
+            const canvas = document.getElementById('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Fondo con gradiente
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#1E3A8A');
+            gradient.addColorStop(1, '#3B82F6');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // Emoji dinero
+            ctx.font = `${size * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('💰', size / 2, size / 2);
+
+            return canvas.toDataURL('image/png');
+        }
+
+        function downloadIcon(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            link.click();
+        }
+
+        function generateAllIcons() {
+            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '<h2>Iconos generados:</h2>';
+
+            sizes.forEach(size => {
+                const dataUrl = generateIcon(size);
+
+                // Crear preview
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'icon-preview';
+
+                const img = document.createElement('img');
+                img.src = dataUrl;
+                img.width = Math.min(size, 128);
+                img.alt = `Icon ${size}x${size}`;
+
+                const label = document.createElement('p');
+                label.textContent = `${size}x${size}`;
+
+                iconDiv.appendChild(img);
+                iconDiv.appendChild(label);
+                preview.appendChild(iconDiv);
+
+                // Descargar automáticamente
+                setTimeout(() => {
+                    downloadIcon(dataUrl, `icon-${size}.png`);
+                }, 100 * sizes.indexOf(size));
+            });
+
+            alert(`Se generarán ${sizes.length} iconos. Revisa la carpeta de descargas y muévelos a la carpeta 'public'.`);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "finanzas-mensuales",
+  "version": "1.0.0",
+  "description": "Aplicación web para control de finanzas personales de parejas",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "finanzas",
+    "presupuesto",
+    "gastos",
+    "control-financiero"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^12.5.0"
+  }
+}

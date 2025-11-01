@@ -30,35 +30,68 @@ let selectedNecesidad = '';
 let useFirebase = true; // Toggle para usar Firebase o localStorage
 
 // ============================================
+// FUNCIONES DE UTILIDAD - FORMATEO CHILENO
+// ============================================
+
+// Funciones para parsear y formatear números en formato chileno (1.000, 10.000, etc.)
+function parseChileanNumber(value) {
+  if (!value) return 0;
+  // Remover puntos y parsear
+  const numericString = value.toString().replace(/\./g, '');
+  return parseInt(numericString, 10) || 0;
+}
+
+function formatChileanNumber(value) {
+  const number = parseInt(value, 10);
+  if (isNaN(number)) return '';
+  return number.toLocaleString('es-CL');
+}
+
+// ============================================
 // INICIALIZACIÓN
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async function() {
   try {
-    // Mostrar modal de autenticación primero
-    showAuthModal();
+    // Verificar si hay una sesión activa
+    const autoLogin = localStorage.getItem('autoLogin');
 
-    // Inicializar Firebase sin autenticar aún
-    // La autenticación se hará cuando el usuario elija en el modal
+    if (autoLogin === 'true') {
+      // Si hay sesión activa, inicializar la app directamente
+      console.log('Sesión activa encontrada, inicializando app...');
+      await initializeFirebaseAuth();
+      await initializeApp();
+      setupEventListeners();
+      updateUI();
+    } else {
+      // Si no hay sesión, mostrar modal de autenticación
+      showAuthModal();
+    }
   } catch (error) {
     console.error('Error al inicializar:', error);
     showToast('Error al iniciar la aplicación', 'error');
   }
 });
 
-function initializeApp() {
+async function initializeApp() {
+  console.log('🚀 Iniciando aplicación...');
+
   // Cargar o inicializar datos desde variables en memoria
-  loadAppData();
-  
+  await loadAppData();
+
+  console.log('📊 Datos cargados:', appData);
+
   // Configurar fecha actual por defecto
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('fechaGasto').value = today;
-  
+
   // Actualizar mes actual
   appData.mesActual = getCurrentMonth();
-  
+
   // Inicializar gráficos
   initializeCharts();
+
+  console.log('✅ Aplicación inicializada');
 }
 
 async function loadAppData() {
@@ -262,6 +295,8 @@ function setupEventListeners() {
   // Actualizar ingresos base y extra
   document.getElementById('ingresoBase').addEventListener('change', actualizarIngresos);
   document.getElementById('ingresoExtra').addEventListener('change', actualizarIngresos);
+  document.getElementById('ingresoBase').addEventListener('blur', actualizarIngresos);
+  document.getElementById('ingresoExtra').addEventListener('blur', actualizarIngresos);
 
   // Botón agregar ingreso
   document.getElementById('btnAgregarIngreso').addEventListener('click', agregarIngreso);
@@ -379,16 +414,22 @@ function updateUserSelects() {
 function handleRegistroSubmit(e) {
   e.preventDefault();
 
+  console.log('💵 Registrando gasto...');
+
   try {
     // Validar campos obligatorios
-    const montoGasto = parseFloat(document.getElementById('montoGasto').value);
+    const montoGastoValue = document.getElementById('montoGasto').value;
+    const montoGasto = parseChileanNumber(montoGastoValue);
     const descripcion = document.getElementById('descripcionGasto').value.trim();
     const categoria = document.getElementById('categoria').value;
     const fecha = document.getElementById('fechaGasto').value;
     const usuario = document.getElementById('usuarioGasto').value;
 
+    console.log('Datos del gasto:', { montoGasto, descripcion, categoria, fecha, usuario, selectedNecesidad });
+
     if (!montoGasto || montoGasto <= 0) {
       showToast('El monto debe ser mayor a 0', 'error');
+      console.error('❌ Monto inválido');
       return;
     }
 
@@ -439,6 +480,10 @@ function handleRegistroSubmit(e) {
     appData.transacciones.push(transaccion);
     saveAppData();
 
+    // Actualizar UI y dashboard
+    updateUI();
+    updateDashboard(); // Actualizar dashboard siempre
+
     showToast('Gasto registrado correctamente', 'success');
     limpiarFormulario();
 
@@ -453,21 +498,38 @@ function handleRegistroSubmit(e) {
 }
 
 function actualizarIngresos() {
-  const ingresoBase = parseFloat(document.getElementById('ingresoBase').value) || 0;
-  const ingresoExtra = parseFloat(document.getElementById('ingresoExtra').value) || 0;
+  console.log('💰 Actualizando ingresos...');
+
+  const ingresoBaseValue = document.getElementById('ingresoBase').value;
+  const ingresoExtraValue = document.getElementById('ingresoExtra').value;
+
+  const ingresoBase = parseChileanNumber(ingresoBaseValue) || 0;
+  const ingresoExtra = parseChileanNumber(ingresoExtraValue) || 0;
+
+  console.log('Valores parseados:', { ingresoBase, ingresoExtra });
 
   const usuario = appData.usuarios.find(u => u.id === appData.usuarioActual);
   if (usuario) {
     usuario.ingresoBase = ingresoBase;
     usuario.ingresoExtra = ingresoExtra;
+    console.log('Usuario actualizado:', usuario);
     saveAppData();
+
+    // Actualizar UI completa
     updateUI();
+
+    // SIEMPRE actualizar el dashboard (incluso si no está visible)
+    updateDashboard();
+
+    console.log('✅ Ingresos actualizados y dashboard refrescado');
+  } else {
+    console.error('❌ Usuario no encontrado');
   }
 }
 
 function agregarIngreso() {
-  const ingresoBase = parseFloat(document.getElementById('ingresoBase').value) || 0;
-  const ingresoExtra = parseFloat(document.getElementById('ingresoExtra').value) || 0;
+  const ingresoBase = parseChileanNumber(document.getElementById('ingresoBase').value) || 0;
+  const ingresoExtra = parseChileanNumber(document.getElementById('ingresoExtra').value) || 0;
 
   if (ingresoBase === 0 && ingresoExtra === 0) {
     showToast('Debes ingresar al menos un monto', 'error');
@@ -499,6 +561,7 @@ function agregarIngreso() {
 
   saveAppData();
   updateUI();
+  updateDashboard(); // Actualizar dashboard siempre
   showToast(`Ingreso de ${formatCLP(totalNuevoIngreso)} agregado correctamente`, 'success');
 }
 
@@ -516,7 +579,7 @@ function handleGastoRapido(e) {
   e.preventDefault();
 
   try {
-    const monto = parseFloat(document.getElementById('montoRapido').value);
+    const monto = parseChileanNumber(document.getElementById('montoRapido').value);
     const descripcion = document.getElementById('descripcionRapido').value.trim();
     const categoria = document.getElementById('categoriaRapido').value;
     const transaccionId = document.getElementById('transaccionIdRapido').value;
@@ -687,13 +750,18 @@ function updateCategorySelects() {
 // ============================================
 
 function updateDashboard() {
+  console.log('📊 Actualizando dashboard...');
+
   try {
     const usuario = appData.usuarios.find(u => u.id === appData.usuarioActual);
 
     if (!usuario) {
       showToast('Usuario no encontrado', 'error');
+      console.error('❌ Usuario no encontrado');
       return;
     }
+
+    console.log('Usuario actual:', usuario);
 
     // Actualizar perfil
     document.getElementById('userGreeting').textContent = `Hola, ${usuario.nombre} 👋`;
@@ -712,12 +780,24 @@ function updateDashboard() {
     const totalGastos = transaccionesMes.reduce((sum, t) => sum + t.monto, 0);
     const balance = totalIngresos - totalGastos;
 
+    console.log('Cálculos del dashboard:', {
+      ingresoBase: usuario.ingresoBase,
+      ingresoExtra: usuario.ingresoExtra,
+      ingresosAcumulados: usuario.ingresosAcumulados,
+      totalIngresos,
+      numTransacciones: transaccionesMes.length,
+      totalGastos,
+      balance
+    });
+
     // Actualizar tarjetas básicas
     document.getElementById('balanceGeneral').textContent = formatCLP(balance);
     document.getElementById('ingresosTotal').textContent = formatCLP(totalIngresos);
     document.getElementById('gastosTotal').textContent = formatCLP(totalGastos);
     document.getElementById('totalGastado').textContent = formatCLP(totalGastos);
     document.getElementById('loQueQueda').textContent = formatCLP(balance);
+
+    console.log('✅ Tarjetas actualizadas');
 
     // Actualizar promedio diario
     const diasMes = new Date().getDate();
@@ -1124,8 +1204,8 @@ function renderTransacciones(transacciones) {
 function aplicarFiltros() {
   const fechaDesde = document.getElementById('filterFechaDesde').value;
   const fechaHasta = document.getElementById('filterFechaHasta').value;
-  const montoMin = parseFloat(document.getElementById('filterMontoMin').value) || 0;
-  const montoMax = parseFloat(document.getElementById('filterMontoMax').value) || Infinity;
+  const montoMin = parseChileanNumber(document.getElementById('filterMontoMin').value) || 0;
+  const montoMax = parseChileanNumber(document.getElementById('filterMontoMax').value) || Infinity;
   const categoria = document.getElementById('filterCategoria').value;
   const usuario = document.getElementById('filterUsuario').value;
   
@@ -1188,7 +1268,7 @@ function abrirModalEdicionRapida(transaccion) {
 
   // Llenar el formulario con los datos existentes
   document.getElementById('transaccionIdRapido').value = transaccion.id;
-  document.getElementById('montoRapido').value = transaccion.monto;
+  document.getElementById('montoRapido').value = formatChileanNumber(transaccion.monto.toString());
   document.getElementById('descripcionRapido').value = transaccion.descripcion;
   document.getElementById('categoriaRapido').value = transaccion.categoria;
   document.getElementById('esGastoRapido').checked = transaccion.esGastoRapido !== false;
@@ -1442,8 +1522,8 @@ function updateUI() {
   // Actualizar ingresos en el formulario
   const usuario = appData.usuarios.find(u => u.id === appData.usuarioActual);
   if (usuario) {
-    document.getElementById('ingresoBase').value = usuario.ingresoBase || '';
-    document.getElementById('ingresoExtra').value = usuario.ingresoExtra || '';
+    document.getElementById('ingresoBase').value = usuario.ingresoBase ? formatChileanNumber(usuario.ingresoBase.toString()) : '';
+    document.getElementById('ingresoExtra').value = usuario.ingresoExtra ? formatChileanNumber(usuario.ingresoExtra.toString()) : '';
 
     // Mostrar panel de ingresos acumulados si hay ingresos
     const panelAcumulados = document.getElementById('ingresosAgregados');
@@ -1460,39 +1540,52 @@ function updateUI() {
 // MODAL DE AUTENTICACIÓN
 // ============================================
 
+// Variable para rastrear si el modal ya fue inicializado
+let authModalInitialized = false;
+
 function showAuthModal() {
   const modal = document.getElementById('authModal');
   modal.classList.add('active');
 
-  // Setup tabs
-  const authTabs = document.querySelectorAll('.auth-tab');
-  authTabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-      // Remover active de todos
-      authTabs.forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  // Solo configurar event listeners la primera vez
+  if (!authModalInitialized) {
+    // Setup tabs
+    const authTabs = document.querySelectorAll('.auth-tab');
 
-      // Activar el seleccionado
-      this.classList.add('active');
-      const tabName = this.dataset.authTab;
-      document.getElementById(`${tabName}Form`).classList.add('active');
+    authTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Remover active de todos
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+
+        // Activar el seleccionado
+        this.classList.add('active');
+        const tabName = this.dataset.authTab;
+        const formElement = document.getElementById(`${tabName}Form`);
+
+        if (formElement) {
+          formElement.classList.add('active');
+        }
+      });
     });
-  });
+
+    // Form de login
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+    // Form de registro
+    document.getElementById('registerForm').addEventListener('submit', handleRegister);
+
+    // Botón de continuar anónimo
+    document.getElementById('continueAnonymous').addEventListener('click', handleContinueAnonymous);
+
+    // Toggle password visibility
+    setupPasswordToggles();
+
+    authModalInitialized = true;
+  }
 
   // Cargar credenciales guardadas si existen
   loadSavedCredentials();
-
-  // Form de login
-  document.getElementById('loginForm').addEventListener('submit', handleLogin);
-
-  // Form de registro
-  document.getElementById('registerForm').addEventListener('submit', handleRegister);
-
-  // Botón de continuar anónimo
-  document.getElementById('continueAnonymous').addEventListener('click', handleContinueAnonymous);
-
-  // Toggle password visibility
-  setupPasswordToggles();
 }
 
 function setupPasswordToggles() {

@@ -64,7 +64,7 @@ class NotificationManager {
 
         if (this.notificationsEnabled) {
           console.log('✅ Notificaciones habilitadas');
-          this.scheduleDaily Reminder();
+          this.scheduleDailyReminder();
           return true;
         } else {
           console.log('❌ Notificaciones denegadas');

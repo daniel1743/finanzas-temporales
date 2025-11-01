@@ -1,0 +1,414 @@
+/* ============================================
+   NAVBAR SUPERIOR
+   ============================================ */
+
+.top-navbar {
+    position: fixed;
+    top: 0;
+    left: 80px;
+    right: 0;
+    height: 70px;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    box-shadow: 0 2px 10px rgba(13, 148, 136, 0.2);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    transition: left 0.3s ease;
+}
+
+.navbar-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.navbar-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.navbar-title:hover {
+    opacity: 0.9;
+}
+
+.navbar-subtitle {
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    font-weight: 400;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.navbar-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-photo-container {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.profile-photo-container:hover {
+    transform: scale(1.05);
+}
+
+.profile-photo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    background: white;
+    transition: border-color 0.3s ease;
+}
+
+.profile-photo-container:hover .profile-photo {
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+.profile-photo-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+}
+
+.upload-photo-input {
+    display: none;
+}
+
+.upload-photo-overlay {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.upload-photo-overlay svg {
+    width: 12px;
+    height: 12px;
+    color: #0d9488;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.navbar-action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.navbar-action-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.navbar-action-btn svg {
+    width: 20px;
+    height: 20px;
+    color: white;
+}
+
+.navbar-action-btn.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Ajustar contenido principal */
+.app-content {
+    margin-top: 70px;
+}
+
+/* Ocultar header original */
+.app-header {
+    display: none;
+}
+
+/* Ocultar nav-tabs original */
+.app-nav {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .top-navbar {
+        left: 0;
+        padding: 0 1rem;
+        padding-left: 70px; /* Espacio para el botón hamburguesa */
+    }
+
+    .navbar-title {
+        font-size: 1.125rem;
+    }
+
+    .navbar-subtitle {
+        font-size: 0.75rem;
+    }
+
+    .navbar-actions {
+        gap: 0.5rem;
+    }
+
+    .navbar-action-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .profile-photo,
+    .profile-photo-placeholder {
+        width: 40px;
+        height: 40px;
+    }
+
+    .navbar-profile {
+        gap: 0.75rem;
+    }
+
+    .app-content {
+        margin-top: 70px;
+        padding-bottom: 90px; /* Espacio para bottom nav */
+    }
+}
+
+/* Animaciones */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.top-navbar {
+    animation: slideDown 0.3s ease;
+}
+
+/* Tooltip para los botones */
+.navbar-action-btn {
+    position: relative;
+}
+
+.navbar-action-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.navbar-action-btn:hover::after {
+    opacity: 1;
+}
+
+/* Dropdown Menu */
+.navbar-dropdown-container {
+    position: relative;
+}
+
+.navbar-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 280px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.navbar-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-header {
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.05) 0%, rgba(15, 118, 110, 0.05) 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.dropdown-user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+}
+
+.dropdown-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 2px solid rgba(13, 148, 136, 0.2);
+}
+
+.dropdown-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dropdown-avatar div {
+    font-size: 20px;
+    color: white;
+}
+
+.dropdown-user-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.dropdown-user-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-user-email {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+    margin: 0.5rem 0;
+}
+
+.dropdown-menu {
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background: rgba(13, 148, 136, 0.08);
+    color: #0d9488;
+}
+
+.dropdown-item.danger {
+    color: #dc2626;
+}
+
+.dropdown-item.danger:hover {
+    background: rgba(220, 38, 38, 0.08);
+    color: #b91c1c;
+}
+
+.dropdown-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.dropdown-item span {
+    flex: 1;
+}
+
+/* Animación del dropdown */
+@keyframes dropdownSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar-dropdown.active {
+    animation: dropdownSlide 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar-dropdown {
+        width: 260px;
+        right: -10px;
+    }
+}

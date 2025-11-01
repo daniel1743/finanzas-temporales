@@ -400,62 +400,280 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 });
 
-// Manejar reinicio de datos
-function handleResetData() {
-    // Mostrar confirmación con doble verificación
-    const confirmReset = confirm('⚠️ ADVERTENCIA: Esto eliminará TODOS tus datos de manera permanente.\n\n¿Estás seguro de que deseas reiniciar todos los datos?\n\n- Se eliminarán todos los ingresos\n- Se eliminarán todos los gastos\n- Se eliminarán todas las transacciones\n- Se eliminarán todas las categorías personalizadas\n- Se restablecerán los usuarios a valores por defecto\n\nEsta acción NO se puede deshacer.');
+// Manejar reinicio de datos - VERSIÓN COMPLETA
+async function handleResetData() {
+    console.log('🗑️ Iniciando proceso de reinicio de datos...');
 
-    if (!confirmReset) return;
+    // PRIMER AVISO - Explicación clara
+    const confirmReset = confirm(
+        '⚠️ ADVERTENCIA CRÍTICA ⚠️\n\n' +
+        'Esto BORRARÁ PERMANENTEMENTE:\n\n' +
+        '❌ Todos los ingresos (base, extra, acumulados)\n' +
+        '❌ Todos los gastos registrados\n' +
+        '❌ Todas las transacciones\n' +
+        '❌ Todas las categorías personalizadas\n' +
+        '❌ Todo el historial financiero\n' +
+        '❌ Fotos de perfil\n\n' +
+        '✅ SE MANTENDRÁ: Tu sesión de usuario\n\n' +
+        '¿Estás seguro de continuar?'
+    );
 
-    // Segunda confirmación
-    const finalConfirm = confirm('¿Realmente deseas continuar? Esta es tu última oportunidad para cancelar.');
+    if (!confirmReset) {
+        console.log('❌ Reinicio cancelado por el usuario (primer aviso)');
+        return;
+    }
 
-    if (!finalConfirm) return;
+    // SEGUNDA CONFIRMACIÓN - Código de seguridad
+    const securityCode = prompt(
+        '🔐 CONFIRMACIÓN FINAL\n\n' +
+        'Para confirmar que realmente quieres borrar TODOS los datos,\n' +
+        'escribe exactamente:\n\n' +
+        'BORRAR TODO\n\n' +
+        '(en mayúsculas, sin espacios extras)'
+    );
+
+    if (securityCode !== 'BORRAR TODO') {
+        console.log('❌ Reinicio cancelado - código incorrecto:', securityCode);
+        if (typeof showToast === 'function') {
+            showToast('Operación cancelada. El código no coincide.', 'warning');
+        } else {
+            alert('❌ Operación cancelada. El código no coincide.');
+        }
+        return;
+    }
 
     try {
-        console.log('🗑️ Reiniciando todos los datos...');
+        console.log('🚀 INICIANDO BORRADO COMPLETO DE DATOS...');
+        console.log('='.repeat(50));
 
-        // Limpiar localStorage (excepto credenciales de sesión)
+        // ====== PASO 1: GUARDAR CREDENCIALES ======
+        console.log('📦 Paso 1: Guardando credenciales de sesión...');
         const autoLogin = localStorage.getItem('autoLogin');
         const userEmail = localStorage.getItem('userEmail');
         const rememberedCredentials = localStorage.getItem('rememberedCredentials');
 
-        // Eliminar todos los datos de la app
-        localStorage.removeItem('finanzasAppData');
-        localStorage.removeItem('navbarProfilePhoto');
-        localStorage.removeItem('userName');
+        console.log('   Credenciales guardadas:', {
+            autoLogin: !!autoLogin,
+            userEmail: !!userEmail,
+            rememberedCredentials: !!rememberedCredentials
+        });
 
-        // Restaurar credenciales de sesión si existen
+        // ====== PASO 2: LIMPIAR LOCALSTORAGE COMPLETAMENTE ======
+        console.log('🧹 Paso 2: Limpiando localStorage...');
+        localStorage.clear();
+        console.log('   ✅ localStorage limpiado');
+
+        // ====== PASO 3: RESTAURAR SOLO CREDENCIALES ======
+        console.log('🔐 Paso 3: Restaurando credenciales de sesión...');
         if (autoLogin) localStorage.setItem('autoLogin', autoLogin);
         if (userEmail) localStorage.setItem('userEmail', userEmail);
         if (rememberedCredentials) localStorage.setItem('rememberedCredentials', rememberedCredentials);
+        console.log('   ✅ Credenciales restauradas');
 
-        console.log('✅ Datos eliminados de localStorage');
+        // ====== PASO 4: RESETEAR DATOS EN MEMORIA (appData) ======
+        console.log('💾 Paso 4: Reseteando datos en memoria...');
+        if (typeof window.appData !== 'undefined') {
+            const defaultData = {
+                usuarios: [
+                    {
+                        id: 1,
+                        nombre: 'Daniel',
+                        foto: '',
+                        ingresoBase: 0,
+                        ingresoExtra: 0,
+                        ingresosAcumulados: 0
+                    },
+                    {
+                        id: 2,
+                        nombre: 'Pareja',
+                        foto: '',
+                        ingresoBase: 0,
+                        ingresoExtra: 0,
+                        ingresosAcumulados: 0
+                    }
+                ],
+                categorias: [
+                    'Alimentación 🍞',
+                    'Transporte 🚗',
+                    'Entretenimiento 🎬',
+                    'Salud 💊',
+                    'Educación 📚',
+                    'Otro ➕'
+                ],
+                necesidades: [
+                    'Alta',
+                    'Media',
+                    'Baja'
+                ],
+                transacciones: [],
+                usuarioActual: 1,
+                mesActual: '',
+                configuracion: {}
+            };
 
-        // Reiniciar datos en Firebase si está disponible
-        if (typeof window.resetFirebaseData === 'function') {
-            window.resetFirebaseData();
-            console.log('✅ Datos eliminados de Firebase');
+            window.appData = defaultData;
+            console.log('   ✅ appData reseteado:', window.appData);
         }
 
-        // Mostrar mensaje de éxito
-        if (typeof showToast === 'function') {
-            showToast('Todos los datos han sido reiniciados correctamente', 'success');
+        // ====== PASO 5: LIMPIAR INDEXEDDB (CACHE DE FIREBASE) ======
+        console.log('🗄️ Paso 5: Limpiando IndexedDB (cache de Firebase)...');
+        try {
+            // Obtener todas las bases de datos
+            if (indexedDB.databases) {
+                const databases = await indexedDB.databases();
+                console.log('   Bases de datos encontradas:', databases.map(db => db.name));
+
+                // Eliminar cada base de datos
+                for (const db of databases) {
+                    await new Promise((resolve, reject) => {
+                        const request = indexedDB.deleteDatabase(db.name);
+                        request.onsuccess = () => {
+                            console.log(`   ✅ Base de datos "${db.name}" eliminada`);
+                            resolve();
+                        };
+                        request.onerror = () => {
+                            console.error(`   ⚠️ Error al eliminar "${db.name}"`);
+                            resolve(); // Continuar aunque falle
+                        };
+                        request.onblocked = () => {
+                            console.warn(`   ⚠️ "${db.name}" bloqueada, forzando eliminación...`);
+                            setTimeout(resolve, 1000);
+                        };
+                    });
+                }
+            } else {
+                // Fallback: intentar eliminar las bases de datos conocidas de Firebase
+                const firebaseDatabases = [
+                    'firebase-heartbeat-database',
+                    'firebaseLocalStorageDb'
+                ];
+
+                for (const dbName of firebaseDatabases) {
+                    await new Promise((resolve) => {
+                        const request = indexedDB.deleteDatabase(dbName);
+                        request.onsuccess = () => console.log(`   ✅ "${dbName}" eliminada`);
+                        request.onerror = () => console.log(`   ℹ️ "${dbName}" no existe o ya fue eliminada`);
+                        request.onblocked = () => console.log(`   ⚠️ "${dbName}" bloqueada`);
+                        setTimeout(resolve, 500);
+                    });
+                }
+            }
+            console.log('   ✅ IndexedDB limpiado');
+        } catch (indexedDBError) {
+            console.error('   ⚠️ Error al limpiar IndexedDB:', indexedDBError);
+        }
+
+        // ====== PASO 6: ELIMINAR DATOS DE FIREBASE FIRESTORE ======
+        console.log('🔥 Paso 6: Eliminando datos de Firebase Firestore...');
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+            const userId = firebase.auth().currentUser.uid;
+            const db = firebase.firestore();
+
+            try {
+                // Eliminar documento del usuario
+                await db.collection('usuarios').doc(userId).delete();
+                console.log('   ✅ Documento de Firebase eliminado');
+
+                // Crear documento limpio con datos por defecto
+                await db.collection('usuarios').doc(userId).set({
+                    usuarios: [
+                        { id: 1, nombre: 'Daniel', foto: '', ingresoBase: 0, ingresoExtra: 0, ingresosAcumulados: 0 },
+                        { id: 2, nombre: 'Pareja', foto: '', ingresoBase: 0, ingresoExtra: 0, ingresosAcumulados: 0 }
+                    ],
+                    categorias: ['Alimentación 🍞', 'Transporte 🚗', 'Entretenimiento 🎬', 'Salud 💊', 'Educación 📚', 'Otro ➕'],
+                    necesidades: ['Alta', 'Media', 'Baja'],
+                    transacciones: [],
+                    usuarioActual: 1,
+                    configuracion: {},
+                    lastUpdated: new Date().toISOString()
+                });
+                console.log('   ✅ Documento limpio creado en Firebase');
+            } catch (firebaseError) {
+                console.error('   ⚠️ Error con Firebase:', firebaseError);
+            }
         } else {
-            alert('✅ Todos los datos han sido reiniciados correctamente');
+            console.log('   ℹ️ Firebase no disponible o usuario no autenticado');
         }
 
-        // Recargar la página después de 1 segundo
+        // ====== PASO 7: RESETEAR INPUTS DEL FORMULARIO ======
+        console.log('📝 Paso 7: Limpiando formularios...');
+        const inputsToReset = [
+            'ingresoBase',
+            'ingresoExtra',
+            'montoGasto',
+            'descripcionGasto',
+            'categoria',
+            'necesidad',
+            'fechaGasto'
+        ];
+
+        inputsToReset.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                if (input.type === 'number' || input.type === 'text') {
+                    input.value = '';
+                } else if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                }
+            }
+        });
+        console.log('   ✅ Formularios limpiados');
+
+        // ====== PASO 8: LIMPIAR VISUALIZACIONES ======
+        console.log('🎨 Paso 8: Limpiando UI...');
+
+        // Limpiar tarjetas del dashboard
+        const cardsToReset = [
+            'balanceGeneral',
+            'totalGastado',
+            'promedioDiario',
+            'categoriaPrincipal',
+            'totalTransacciones',
+            'ingresosTotal',
+            'gastosTotal'
+        ];
+
+        cardsToReset.forEach(cardId => {
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.textContent = '$0';
+            }
+        });
+
+        // Limpiar lista de transacciones
+        const transaccionesList = document.getElementById('transaccionesList');
+        if (transaccionesList) {
+            transaccionesList.innerHTML = '<p style="text-align: center; color: #6b7280;">No hay transacciones registradas</p>';
+        }
+
+        console.log('   ✅ UI limpiada');
+
+        console.log('='.repeat(50));
+        console.log('✅ REINICIO COMPLETO EXITOSO');
+
+        // ====== MOSTRAR MENSAJE DE ÉXITO ======
+        if (typeof showToast === 'function') {
+            showToast('✅ Todos los datos han sido borrados. Recargando...', 'success');
+        } else {
+            alert('✅ Todos los datos han sido borrados correctamente.\n\nLa página se recargará en 2 segundos.');
+        }
+
+        // ====== RECARGAR LA PÁGINA ======
+        console.log('🔄 Recargando página en 2 segundos...');
         setTimeout(() => {
-            window.location.reload();
-        }, 1000);
+            window.location.reload(true); // true = forzar recarga desde servidor
+        }, 2000);
 
     } catch (error) {
-        console.error('Error al reiniciar datos:', error);
+        console.error('='.repeat(50));
+        console.error('❌ ERROR CRÍTICO AL REINICIAR DATOS:', error);
+        console.error('Stack trace:', error.stack);
+        console.error('='.repeat(50));
+
         if (typeof showToast === 'function') {
-            showToast('Error al reiniciar los datos. Intenta de nuevo.', 'error');
+            showToast('❌ Error al reiniciar los datos: ' + error.message, 'error');
         } else {
-            alert('❌ Error al reiniciar los datos. Intenta de nuevo.');
+            alert('❌ Error al reiniciar los datos:\n\n' + error.message + '\n\nRevisa la consola para más detalles (F12)');
         }
     }
 }

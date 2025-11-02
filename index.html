@@ -931,6 +931,32 @@
         </div>
     </div>
 
+    <!-- Modal de Actualización de App -->
+    <div id="updateModal" class="update-modal">
+        <div class="update-modal-content">
+            <div class="update-icon-wrapper">
+                <div class="update-icon-pulse"></div>
+                <span class="update-icon">🔄</span>
+            </div>
+            <h3 class="update-title">Nueva versión disponible</h3>
+            <p class="update-message">
+                Hay una nueva versión de la aplicación lista para instalarse.
+                <br>¿Deseas actualizar ahora?
+            </p>
+            <div class="update-actions">
+                <button class="btn-update-dismiss" id="btnUpdateDismiss">
+                    Más tarde
+                </button>
+                <button class="btn-update-confirm" id="btnUpdateConfirm">
+                    Actualizar ahora
+                </button>
+            </div>
+            <p class="update-info">
+                Se limpiará el caché y se aplicarán las últimas mejoras
+            </p>
+        </div>
+    </div>
+
     <!-- Notificación Toast -->
     <div id="toast" class="toast"></div>
 
@@ -947,32 +973,139 @@
 
     <!-- Service Worker Registration -->
     <script>
-        // Registro del Service Worker para PWA
+        // ============================================
+        // SISTEMA DE ACTUALIZACIÓN ELEGANTE CON SERVICE WORKER
+        // ============================================
+
+        let newWorker = null;
+        let isRefreshing = false;
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
                     .then(registration => {
                         console.log('✅ Service Worker registrado:', registration.scope);
 
-                        // Verificar actualizaciones periódicamente
+                        // Detectar cuando hay una nueva versión en espera (waiting)
+                        registration.addEventListener('updatefound', () => {
+                            console.log('🔍 Nueva actualización encontrada...');
+                            newWorker = registration.installing;
+
+                            newWorker.addEventListener('statechange', () => {
+                                console.log('📦 Estado del SW:', newWorker.state);
+
+                                // Cuando el nuevo SW pasa a estado "installed"
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Hay un nuevo Service Worker esperando
+                                    console.log('✨ Nueva versión lista para instalarse');
+                                    showUpdateModal();
+                                }
+                            });
+                        });
+
+                        // Verificar actualizaciones periódicamente (cada 5 minutos)
                         setInterval(() => {
+                            console.log('🔄 Verificando actualizaciones...');
                             registration.update();
-                        }, 60000); // Cada minuto
+                        }, 300000); // 5 minutos
+
+                        // Verificar si ya hay un SW en espera al cargar
+                        if (registration.waiting) {
+                            console.log('⏳ Ya hay un SW esperando');
+                            newWorker = registration.waiting;
+                            showUpdateModal();
+                        }
                     })
                     .catch(error => {
                         console.error('❌ Error al registrar Service Worker:', error);
                     });
-            });
 
-            // Detectar cuando hay una nueva versión disponible
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                console.log('🔄 Nueva versión disponible');
-                // Opcional: Mostrar notificación al usuario
-                if (confirm('Hay una nueva versión disponible. ¿Deseas actualizar?')) {
+                // Detectar cuando el controller cambia (nueva versión activa)
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    console.log('🎉 Nueva versión activada');
+
+                    // Prevenir recargas múltiples
+                    if (isRefreshing) return;
+                    isRefreshing = true;
+
+                    console.log('🔄 Recargando aplicación con nueva versión...');
                     window.location.reload();
-                }
+                });
             });
         }
+
+        // ============================================
+        // FUNCIONES PARA EL MODAL DE ACTUALIZACIÓN
+        // ============================================
+
+        function showUpdateModal() {
+            const modal = document.getElementById('updateModal');
+            const btnConfirm = document.getElementById('btnUpdateConfirm');
+            const btnDismiss = document.getElementById('btnUpdateDismiss');
+
+            if (!modal) {
+                console.warn('⚠️ Modal de actualización no encontrado');
+                return;
+            }
+
+            // Mostrar modal con animación
+            modal.classList.add('show');
+
+            // Botón "Actualizar ahora"
+            btnConfirm.onclick = () => {
+                console.log('👍 Usuario aceptó actualizar');
+                applyUpdate();
+            };
+
+            // Botón "Más tarde"
+            btnDismiss.onclick = () => {
+                console.log('⏭️ Usuario pospuso actualización');
+                hideUpdateModal();
+            };
+        }
+
+        function hideUpdateModal() {
+            const modal = document.getElementById('updateModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        async function applyUpdate() {
+            console.log('🚀 Aplicando actualización...');
+
+            if (!newWorker) {
+                console.error('❌ No hay Service Worker nuevo disponible');
+                return;
+            }
+
+            // Enviar mensaje al SW para que se active inmediatamente
+            newWorker.postMessage({ type: 'SKIP_WAITING' });
+
+            // Opcional: Limpiar caché del navegador
+            if ('caches' in window) {
+                const cacheKeys = await caches.keys();
+                console.log('🧹 Limpiando cachés antiguos:', cacheKeys);
+
+                // Eliminar cachés que no sean la versión actual
+                await Promise.all(
+                    cacheKeys.map(key => {
+                        // Mantener solo el caché más reciente
+                        if (!key.includes('v1.0.4')) { // Versión actual
+                            console.log('🗑️ Eliminando caché:', key);
+                            return caches.delete(key);
+                        }
+                    })
+                );
+            }
+
+            // El reload se hará automáticamente cuando se dispare 'controllerchange'
+            console.log('⏳ Esperando activación del nuevo Service Worker...');
+        }
+    </script>
+
+    <!-- Script de instalación PWA -->
+    <script>
 
         // Prompt de instalación de PWA
         let deferredPrompt;

@@ -1,5 +1,6 @@
 // Service Worker para PWA - Finanzas Mensuales
-const CACHE_NAME = 'finanzas-mensuales-v1.0.3';
+const CACHE_VERSION = 'v1.0.4';
+const CACHE_NAME = `finanzas-mensuales-${CACHE_VERSION}`;
 const urlsToCache = [
   '/',
   '/index.html',
@@ -19,7 +20,7 @@ const urlsToCache = [
 
 // Instalación del Service Worker
 self.addEventListener('install', event => {
-  console.log('[SW] Instalando Service Worker...');
+  console.log(`[SW] Instalando Service Worker ${CACHE_VERSION}...`);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -30,7 +31,8 @@ self.addEventListener('install', event => {
         console.error('[SW] Error al cachear archivos:', err);
       })
   );
-  self.skipWaiting();
+  // NO hacer skipWaiting automáticamente, esperar mensaje del cliente
+  // self.skipWaiting();
 });
 
 // Activación del Service Worker
@@ -97,6 +99,7 @@ self.addEventListener('fetch', event => {
 // Manejo de mensajes desde el cliente
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[SW] ⚡ Recibido mensaje SKIP_WAITING - Activando nueva versión inmediatamente');
     self.skipWaiting();
   }
 });

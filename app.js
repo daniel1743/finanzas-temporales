@@ -26,6 +26,9 @@ let appData = {
   configuracion: {}
 };
 
+// Exponer appData globalmente para que historial.js pueda acceder
+window.appData = appData;
+
 let chartInstances = {};
 let selectedNecesidad = '';
 let useFirebase = true; // Toggle para usar Firebase o localStorage
@@ -106,6 +109,7 @@ async function loadAppData() {
           ...appData,
           ...firestoreData
         };
+        window.appData = appData; // Sincronizar con window
         console.log('Datos cargados desde Firestore');
       } else {
         // Si no hay datos en Firestore, intentar localStorage
@@ -116,6 +120,7 @@ async function loadAppData() {
             ...appData,
             ...parsed
           };
+          window.appData = appData; // Sincronizar con window
           console.log('Datos cargados desde localStorage');
           // Sincronizar a Firestore
           await saveToFirestore(appData);
@@ -133,6 +138,7 @@ async function loadAppData() {
           ...appData,
           ...parsed
         };
+        window.appData = appData; // Sincronizar con window
         console.log('Datos cargados desde localStorage');
       } else {
         initializeDefaultData();
@@ -147,6 +153,7 @@ async function loadAppData() {
       const savedData = localStorage.getItem('finanzasAppData');
       if (savedData) {
         appData = JSON.parse(savedData);
+        window.appData = appData; // Sincronizar con window
       } else {
         initializeDefaultData();
       }
@@ -199,6 +206,13 @@ function initializeDefaultData() {
   if (appData.transacciones.length === 0) {
     appData.transacciones = [];
   }
+
+  if (!appData.historial) {
+    appData.historial = [];
+  }
+
+  // Sincronizar con window
+  window.appData = appData;
 }
 
 async function saveAppData() {
@@ -827,14 +841,25 @@ function updateDashboard() {
     console.log('Usuario actual:', usuario);
 
     // Actualizar perfil
-    document.getElementById('userGreeting').textContent = `Hola, ${usuario.nombre} 👋`;
+    const userGreeting = document.getElementById('userGreeting');
+    if (userGreeting) {
+      userGreeting.textContent = `Hola, ${usuario.nombre} 👋`;
+    }
+
     const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     const currentDate = new Date();
     const monthName = monthNames[currentDate.getMonth()];
-    document.getElementById('monthInfo').textContent = `Tus finanzas de ${monthName} van así:`;
+
+    const monthInfo = document.getElementById('monthInfo');
+    if (monthInfo) {
+      monthInfo.textContent = `Tus finanzas de ${monthName} van así:`;
+    }
 
     if (usuario.foto) {
-      document.getElementById('userAvatar').src = usuario.foto;
+      const userAvatar = document.getElementById('userAvatar');
+      if (userAvatar) {
+        userAvatar.src = usuario.foto;
+      }
     }
 
     // Calcular totales
@@ -853,12 +878,21 @@ function updateDashboard() {
       balance
     });
 
-    // Actualizar tarjetas básicas
-    document.getElementById('balanceGeneral').textContent = formatCLP(balance);
-    document.getElementById('ingresosTotal').textContent = formatCLP(totalIngresos);
-    document.getElementById('gastosTotal').textContent = formatCLP(totalGastos);
-    document.getElementById('totalGastado').textContent = formatCLP(totalGastos);
-    document.getElementById('loQueQueda').textContent = formatCLP(balance);
+    // Actualizar tarjetas básicas con validaciones
+    const balanceGeneral = document.getElementById('balanceGeneral');
+    if (balanceGeneral) balanceGeneral.textContent = formatCLP(balance);
+
+    const ingresosTotal = document.getElementById('ingresosTotal');
+    if (ingresosTotal) ingresosTotal.textContent = formatCLP(totalIngresos);
+
+    const gastosTotal = document.getElementById('gastosTotal');
+    if (gastosTotal) gastosTotal.textContent = formatCLP(totalGastos);
+
+    const totalGastado = document.getElementById('totalGastado');
+    if (totalGastado) totalGastado.textContent = formatCLP(totalGastos);
+
+    const loQueQueda = document.getElementById('loQueQueda');
+    if (loQueQueda) loQueQueda.textContent = formatCLP(balance);
 
     console.log('✅ Tarjetas actualizadas');
 
@@ -868,9 +902,14 @@ function updateDashboard() {
     const diasEnMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
     const proyeccion = promedioDiario * diasEnMes;
 
-    document.getElementById('promedioDiario').textContent = formatCLP(promedioDiario);
-    document.getElementById('diasMes').textContent = diasMes;
-    document.getElementById('proyeccionMensual').textContent = formatCLP(proyeccion);
+    const promedioDiarioEl = document.getElementById('promedioDiario');
+    if (promedioDiarioEl) promedioDiarioEl.textContent = formatCLP(promedioDiario);
+
+    const diasMesEl = document.getElementById('diasMes');
+    if (diasMesEl) diasMesEl.textContent = diasMes;
+
+    const proyeccionMensualEl = document.getElementById('proyeccionMensual');
+    if (proyeccionMensualEl) proyeccionMensualEl.textContent = formatCLP(proyeccion);
 
     // Actualizar categoría principal
     const categoriasSums = {};
@@ -879,35 +918,54 @@ function updateDashboard() {
       categoriasSums[t.categoria] += t.monto;
     });
 
-    const categoriaPrincipal = Object.entries(categoriasSums).sort((a, b) => b[1] - a[1])[0];
-    if (categoriaPrincipal) {
-      document.getElementById('categoriaPrincipal').textContent = categoriaPrincipal[0];
-      document.getElementById('montoCategoriaPrincipal').textContent = formatCLP(categoriaPrincipal[1]);
-      const porcentaje = (categoriaPrincipal[1] / totalGastos * 100).toFixed(1);
-      document.getElementById('porcentajeCategoria').textContent = porcentaje + '%';
-    }
+    // Categoría principal - COMENTADO porque ahora la tarjeta es "Últimos Movimientos"
+    // const categoriaPrincipal = Object.entries(categoriasSums).sort((a, b) => b[1] - a[1])[0];
+    // if (categoriaPrincipal) {
+    //   document.getElementById('categoriaPrincipal').textContent = categoriaPrincipal[0];
+    //   document.getElementById('montoCategoriaPrincipal').textContent = formatCLP(categoriaPrincipal[1]);
+    //   const porcentaje = (categoriaPrincipal[1] / totalGastos * 100).toFixed(1);
+    //   document.getElementById('porcentajeCategoria').textContent = porcentaje + '%';
+    // }
 
     // Actualizar total de transacciones
-    document.getElementById('totalTransacciones').textContent = transaccionesMes.length;
+    const totalTransacciones = document.getElementById('totalTransacciones');
+    if (totalTransacciones) {
+      totalTransacciones.textContent = transaccionesMes.length;
+    }
+
     if (transaccionesMes.length > 0) {
       const montos = transaccionesMes.map(t => t.monto);
-      document.getElementById('transaccionMaxima').textContent = formatCLP(Math.max(...montos));
-      document.getElementById('transaccionMinima').textContent = formatCLP(Math.min(...montos));
+      const transaccionMaxima = document.getElementById('transaccionMaxima');
+      if (transaccionMaxima) {
+        transaccionMaxima.textContent = formatCLP(Math.max(...montos));
+      }
+      const transaccionMinima = document.getElementById('transaccionMinima');
+      if (transaccionMinima) {
+        transaccionMinima.textContent = formatCLP(Math.min(...montos));
+      }
     }
 
     // Actualizar detalles de gastos por categoría
     const gastadoPorCategoria = document.getElementById('gastadoPorCategoria');
-    gastadoPorCategoria.innerHTML = '';
-    Object.entries(categoriasSums).forEach(([cat, sum]) => {
-      const p = document.createElement('p');
-      p.innerHTML = `<strong>${sanitizeHTML(cat)}:</strong> ${formatCLP(sum)}`;
-      gastadoPorCategoria.appendChild(p);
-    });
+    if (gastadoPorCategoria) {
+      gastadoPorCategoria.innerHTML = '';
+      Object.entries(categoriasSums).forEach(([cat, sum]) => {
+        const p = document.createElement('p');
+        p.innerHTML = `<strong>${sanitizeHTML(cat)}:</strong> ${formatCLP(sum)}`;
+        gastadoPorCategoria.appendChild(p);
+      });
+    }
 
     // Actualizar barra de progreso
     const porcentajeUsado = totalIngresos > 0 ? (totalGastos / totalIngresos * 100) : 0;
-    document.getElementById('progressFill').style.width = `${Math.min(porcentajeUsado, 100)}%`;
-    document.getElementById('progressText').textContent = `${porcentajeUsado.toFixed(1)}% del presupuesto utilizado`;
+    const progressFill = document.getElementById('progressFill');
+    if (progressFill) {
+      progressFill.style.width = `${Math.min(porcentajeUsado, 100)}%`;
+    }
+    const progressText = document.getElementById('progressText');
+    if (progressText) {
+      progressText.textContent = `${porcentajeUsado.toFixed(1)}% del presupuesto utilizado`;
+    }
 
     // Actualizar gráficos
     updateCharts(transaccionesMes);

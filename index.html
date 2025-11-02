@@ -627,30 +627,40 @@
             </div>
         </section>
 
-        <!-- Tab 4: HISTORIAL -->
+        <!-- Tab 4: HISTORIAL COMPLETO -->
         <section id="historial" class="tab-content">
             <div class="section-header">
-                <h2>📜 Historial</h2>
-                <p>Histórico completo de tus finanzas</p>
+                <h2>📜 Historial Completo</h2>
+                <p>Todos los movimientos registrados en tu cuenta</p>
             </div>
 
-            <div class="history-section">
-                <h3>📅 Mes Actual</h3>
-                <div id="mesActualContent" class="history-content">
-                    <p class="no-data">No hay datos del mes actual</p>
+            <!-- Resumen del historial completo -->
+            <div id="resumenHistorialCompleto" class="historial-resumen-completo"></div>
+
+            <!-- Filtros de búsqueda -->
+            <div class="historial-filtros">
+                <div class="filtro-grupo">
+                    <label for="filtroTipoHistorial">Tipo:</label>
+                    <select id="filtroTipoHistorial" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="ingreso">Ingresos</option>
+                        <option value="gasto">Gastos</option>
+                        <option value="modificacion">Modificaciones</option>
+                        <option value="eliminacion">Eliminaciones</option>
+                    </select>
                 </div>
-                <div id="resumenActual" class="history-summary"></div>
-            </div>
-
-            <div class="history-section">
-                <h3>📅 Mes Anterior</h3>
-                <div id="mesAnteriorContent" class="history-content">
-                    <p class="no-data">No hay datos del mes anterior</p>
+                <div class="filtro-grupo">
+                    <button id="btnLimpiarFiltrosHistorial" class="btn btn--secondary">Limpiar Filtros</button>
                 </div>
-                <div id="resumenAnterior" class="history-summary"></div>
             </div>
 
-            <div class="export-section">
+            <!-- Lista completa del historial -->
+            <div id="listaHistorialCompleto" class="historial-lista-completa">
+                <p class="no-data">No hay movimientos registrados</p>
+            </div>
+
+            <!-- Botón de exportar -->
+            <div class="export-section" style="margin-top: 24px;">
                 <button id="exportarCSV" class="btn btn--primary">📥 Exportar Historial a CSV</button>
             </div>
         </section>

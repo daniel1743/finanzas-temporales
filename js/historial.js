@@ -339,10 +339,10 @@ function actualizarMiniHistorial() {
         return;
     }
 
-    // Tomar los últimos 10 movimientos
-    const ultimos10 = historial.slice(0, 10);
+    // Tomar los últimos 200 movimientos
+    const ultimos200 = historial.slice(0, 200);
 
-    if (ultimos10.length === 0) {
+    if (ultimos200.length === 0) {
         miniHistorialContainer.innerHTML = '<p class="no-data">No hay movimientos registrados</p>';
         if (resumenElement) {
             resumenElement.textContent = 'Sin movimientos';
@@ -352,7 +352,7 @@ function actualizarMiniHistorial() {
 
     // Actualizar resumen
     if (resumenElement) {
-        const ultimo = ultimos10[0];
+        const ultimo = ultimos200[0];
         const iconoTipo = {
             'ingreso': '💰',
             'gasto': '💸',
@@ -360,13 +360,13 @@ function actualizarMiniHistorial() {
             'eliminacion': '🗑️'
         }[ultimo.tipo] || '📝';
 
-        resumenElement.textContent = `${iconoTipo} ${ultimos10.length} movimiento${ultimos10.length > 1 ? 's' : ''} reciente${ultimos10.length > 1 ? 's' : ''}`;
+        resumenElement.textContent = `${iconoTipo} ${ultimos200.length} movimiento${ultimos200.length > 1 ? 's' : ''} reciente${ultimos200.length > 1 ? 's' : ''}`;
     }
 
     // Renderizar mini historial
     let html = '';
 
-    ultimos10.forEach(entrada => {
+    ultimos200.forEach(entrada => {
         const fecha = new Date(entrada.fecha);
         const ahora = new Date();
         const diffMs = ahora - fecha;
@@ -417,7 +417,7 @@ function actualizarMiniHistorial() {
     });
 
     miniHistorialContainer.innerHTML = html;
-    console.log('✅ Mini historial actualizado con', ultimos10.length, 'movimientos');
+    console.log('✅ Mini historial actualizado con', ultimos200.length, 'movimientos');
 }
 
 /**

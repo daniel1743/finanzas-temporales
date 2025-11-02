@@ -176,8 +176,9 @@ async function loadAppData() {
 function initializeDefaultData() {
   if (appData.usuarios.length === 0) {
     appData.usuarios = [
-      { id: 1, nombre: 'Daniel', foto: '', ingresoBase: 0, ingresoExtra: 0, ingresosAcumulados: 0 },
-      { id: 2, nombre: 'Pareja', foto: '', ingresoBase: 0, ingresoExtra: 0, ingresosAcumulados: 0 }
+      { id: 1, nombre: 'Daniel Falcon', foto: '', ingresoBase: 0, ingresoExtra: 0, ingresosAcumulados: 0 },
+      { id: 2, nombre: 'Givonik Marrero', foto: '', ingresoBase: 0, ingresoExtra: 0, ingresosAcumulados: 0 },
+      { id: 3, nombre: 'Ambos', foto: '', ingresoBase: 0, ingresoExtra: 0, ingresosAcumulados: 0 }
     ];
   } else {
     // Asegurar que usuarios existentes tengan el campo ingresosAcumulados

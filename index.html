@@ -938,21 +938,20 @@
                 <div class="update-icon-pulse"></div>
                 <span class="update-icon">🔄</span>
             </div>
-            <h3 class="update-title">Nueva versión disponible</h3>
+            <h3 class="update-title">¿Limpiar caché y actualizar métricas?</h3>
             <p class="update-message">
-                Hay una nueva versión de la aplicación lista para instalarse.
-                <br>¿Deseas actualizar ahora?
+                Actualiza la aplicación para ver las últimas métricas de tus gastos sincronizadas desde todos tus dispositivos.
             </p>
             <div class="update-actions">
                 <button class="btn-update-dismiss" id="btnUpdateDismiss">
                     Más tarde
                 </button>
                 <button class="btn-update-confirm" id="btnUpdateConfirm">
-                    Actualizar ahora
+                    🧹 Limpiar y actualizar
                 </button>
             </div>
             <p class="update-info">
-                Se limpiará el caché y se aplicarán las últimas mejoras
+                Se limpiará la caché local y se cargarán los datos más recientes
             </p>
         </div>
     </div>
@@ -1079,28 +1078,54 @@
                 return;
             }
 
-            // Enviar mensaje al SW para que se active inmediatamente
-            newWorker.postMessage({ type: 'SKIP_WAITING' });
+            // Mostrar indicador de carga
+            const btnConfirm = document.getElementById('btnUpdateConfirm');
+            const originalText = btnConfirm.textContent;
+            btnConfirm.disabled = true;
+            btnConfirm.textContent = '⏳ Actualizando...';
 
-            // Opcional: Limpiar caché del navegador
-            if ('caches' in window) {
-                const cacheKeys = await caches.keys();
-                console.log('🧹 Limpiando cachés antiguos:', cacheKeys);
+            try {
+                // 1. Limpiar caché del navegador
+                if ('caches' in window) {
+                    const cacheKeys = await caches.keys();
+                    console.log('🧹 Limpiando cachés antiguos:', cacheKeys);
 
-                // Eliminar cachés que no sean la versión actual
-                await Promise.all(
-                    cacheKeys.map(key => {
-                        // Mantener solo el caché más reciente
-                        if (!key.includes('v1.0.4')) { // Versión actual
-                            console.log('🗑️ Eliminando caché:', key);
-                            return caches.delete(key);
-                        }
-                    })
-                );
+                    await Promise.all(
+                        cacheKeys.map(key => {
+                            if (!key.includes('v1.0.5')) { // Versión actual
+                                console.log('🗑️ Eliminando caché:', key);
+                                return caches.delete(key);
+                            }
+                        })
+                    );
+                }
+
+                // 2. Limpiar localStorage de datos temporales (NO credenciales)
+                const keysToKeep = ['autoLogin', 'savedEmail', 'rememberMe'];
+                const allKeys = Object.keys(localStorage);
+
+                allKeys.forEach(key => {
+                    if (!keysToKeep.includes(key)) {
+                        console.log('🗑️ Limpiando localStorage:', key);
+                        localStorage.removeItem(key);
+                    }
+                });
+
+                // 3. Marcar que se debe recargar datos de Firebase
+                sessionStorage.setItem('forceReloadData', 'true');
+
+                // 4. Enviar mensaje al SW para que se active inmediatamente
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+
+                console.log('⏳ Esperando activación del nuevo Service Worker...');
+                // El reload se hará automáticamente cuando se dispare 'controllerchange'
+
+            } catch (error) {
+                console.error('❌ Error al actualizar:', error);
+                btnConfirm.disabled = false;
+                btnConfirm.textContent = originalText;
+                alert('Error al actualizar. Por favor recarga la página manualmente.');
             }
-
-            // El reload se hará automáticamente cuando se dispare 'controllerchange'
-            console.log('⏳ Esperando activación del nuevo Service Worker...');
         }
     </script>
 

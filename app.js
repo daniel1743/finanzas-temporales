@@ -101,8 +101,17 @@ async function initializeApp() {
 
 async function loadAppData() {
   try {
+    // Verificar si se debe forzar la recarga desde Firebase
+    const forceReload = sessionStorage.getItem('forceReloadData');
+    if (forceReload === 'true') {
+      console.log('🔄 Forzando recarga de datos desde Firebase...');
+      sessionStorage.removeItem('forceReloadData');
+      // Limpiar localStorage de datos
+      localStorage.removeItem('finanzasAppData');
+    }
+
     if (useFirebase) {
-      // Intentar cargar desde Firestore primero
+      // Intentar cargar desde Firestore primero (siempre)
       const firestoreData = await loadFromFirestore();
 
       if (firestoreData) {
@@ -111,7 +120,14 @@ async function loadAppData() {
           ...firestoreData
         };
         window.appData = appData; // Sincronizar con window
-        console.log('Datos cargados desde Firestore');
+        console.log('📊 Datos cargados desde Firestore');
+
+        // Si se forzó la recarga, mostrar notificación
+        if (forceReload === 'true') {
+          setTimeout(() => {
+            showToast('✅ Datos actualizados desde la nube', 'success');
+          }, 1000);
+        }
       } else {
         // Si no hay datos en Firestore, intentar localStorage
         const localData = localStorage.getItem('finanzasAppData');

@@ -373,3 +373,166 @@
         text-align: center;
     }
 }
+
+/* ============================================
+   TARJETA RESUMEN DEL MES
+   ============================================ */
+
+.resumen-mes-card {
+    background: linear-gradient(135deg, #540688 0%, #101966 100%);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 10px 30px rgba(20, 184, 166, 0.3);
+    color: white;
+}
+
+.resumen-mes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.resumen-mes-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+}
+
+.resumen-mes-badge {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.resumen-mes-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.resumen-mes-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.resumen-mes-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.resumen-mes-item.inicio {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.resumen-mes-item.gastado {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.resumen-mes-item.restante {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.resumen-mes-icon {
+    font-size: 32px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.resumen-mes-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.resumen-mes-label {
+    font-size: 13px;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.resumen-mes-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+}
+
+.resumen-mes-value.destacado {
+    font-size: 32px;
+    color: #fbbf24;
+    text-shadow: 0 2px 8px rgba(251, 191, 36, 0.5);
+}
+
+.resumen-mes-separator {
+    font-size: 28px;
+    font-weight: 700;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+/* Responsive para la tarjeta resumen */
+@media (max-width: 968px) {
+    .resumen-mes-content {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .resumen-mes-separator {
+        transform: rotate(90deg);
+        font-size: 24px;
+    }
+
+    .resumen-mes-item {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .resumen-mes-card {
+        padding: 16px;
+    }
+
+    .resumen-mes-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .resumen-mes-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+
+    .resumen-mes-value {
+        font-size: 22px;
+    }
+
+    .resumen-mes-value.destacado {
+        font-size: 26px;
+    }
+}

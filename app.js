@@ -373,27 +373,54 @@ function handleUserChange(e) {
   if (value === 'new') {
     const nombre = prompt('Ingresa el nombre del nuevo usuario:');
     if (nombre && nombre.trim()) {
+      // Generar ID único (máximo ID actual + 1)
+      const maxId = appData.usuarios.length > 0
+        ? Math.max(...appData.usuarios.map(u => u.id))
+        : 0;
+
       const newUser = {
-        id: appData.usuarios.length + 1,
+        id: maxId + 1,
         nombre: nombre.trim(),
         foto: '',
         ingresoBase: 0,
-        ingresoExtra: 0
+        ingresoExtra: 0,
+        ingresosAcumulados: 0
       };
+
       appData.usuarios.push(newUser);
       appData.usuarioActual = newUser.id;
+
+      // Sincronizar con window.appData
+      window.appData = appData;
+
       updateUserSelects();
       saveAppData();
-      showToast('Usuario agregado correctamente', 'success');
+      updateUI();
+
+      showToast(`✅ Usuario "${nombre.trim()}" agregado correctamente`, 'success');
+
+      console.log('✅ Nuevo usuario creado:', newUser);
     } else {
+      // Si cancela, volver al usuario actual
       e.target.value = appData.usuarioActual;
     }
   } else {
+    // Cambiar a usuario existente
+    const oldUserId = appData.usuarioActual;
     appData.usuarioActual = parseInt(value);
+
+    // Sincronizar con window.appData
+    window.appData = appData;
+
     saveAppData();
+    updateUI();
+
+    const usuario = appData.usuarios.find(u => u.id === appData.usuarioActual);
+    if (usuario) {
+      showToast(`Cambiado a usuario: ${usuario.nombre}`, 'info');
+      console.log('✅ Usuario cambiado:', usuario);
+    }
   }
-  
-  updateUI();
 }
 
 function updateUserSelects() {
@@ -849,10 +876,18 @@ function updateDashboard() {
     const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     const currentDate = new Date();
     const monthName = monthNames[currentDate.getMonth()];
+    const year = currentDate.getFullYear();
 
     const monthInfo = document.getElementById('monthInfo');
     if (monthInfo) {
       monthInfo.textContent = `Tus finanzas de ${monthName} van así:`;
+    }
+
+    // Actualizar badge del mes en tarjeta resumen
+    const mesResumenBadge = document.getElementById('mesResumenBadge');
+    if (mesResumenBadge) {
+      const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+      mesResumenBadge.textContent = `${capitalizedMonth} ${year}`;
     }
 
     if (usuario.foto) {
@@ -867,6 +902,22 @@ function updateDashboard() {
     const totalIngresos = usuario.ingresoBase + usuario.ingresoExtra + (usuario.ingresosAcumulados || 0);
     const totalGastos = transaccionesMes.reduce((sum, t) => sum + t.monto, 0);
     const balance = totalIngresos - totalGastos;
+
+    // Actualizar tarjeta resumen del mes
+    const inicioMesValor = document.getElementById('inicioMesValor');
+    if (inicioMesValor) {
+      inicioMesValor.textContent = formatCLP(totalIngresos);
+    }
+
+    const totalGastadoMes = document.getElementById('totalGastadoMes');
+    if (totalGastadoMes) {
+      totalGastadoMes.textContent = formatCLP(totalGastos);
+    }
+
+    const restanteMesValor = document.getElementById('restanteMesValor');
+    if (restanteMesValor) {
+      restanteMesValor.textContent = formatCLP(balance);
+    }
 
     console.log('Cálculos del dashboard:', {
       ingresoBase: usuario.ingresoBase,
@@ -1303,14 +1354,31 @@ function updateCharts(transacciones) {
     chartInstances.radar.data.datasets[0].data = Object.values(necesidadesSums);
     chartInstances.radar.update('none');
 
-    // Gráfico lineal - Evolución diaria
+    // Gráfico lineal - Evolución diaria de gastos
     const diasSums = {};
+
+    // Agrupar transacciones por fecha
     transacciones.forEach(t => {
-      if (!diasSums[t.fecha]) diasSums[t.fecha] = 0;
-      diasSums[t.fecha] += t.monto;
+      const fecha = t.fecha; // Formato YYYY-MM-DD
+      if (!diasSums[fecha]) {
+        diasSums[fecha] = 0;
+      }
+      diasSums[fecha] += t.monto;
     });
-    const sortedDates = Object.keys(diasSums).sort();
-    chartInstances.line.data.labels = sortedDates;
+
+    // Ordenar fechas cronológicamente
+    const sortedDates = Object.keys(diasSums).sort((a, b) => new Date(a) - new Date(b));
+
+    // Formatear fechas para mejor visualización (DD/MM)
+    const formattedLabels = sortedDates.map(fecha => {
+      const date = new Date(fecha + 'T00:00:00'); // Evitar zona horaria
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}`;
+    });
+
+    // Actualizar gráfico con datos diarios
+    chartInstances.line.data.labels = formattedLabels;
     chartInstances.line.data.datasets[0].data = sortedDates.map(d => diasSums[d]);
     chartInstances.line.update('none');
 

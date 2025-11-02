@@ -1,12 +1,20 @@
 // Service Worker para PWA - Finanzas Mensuales
-const CACHE_NAME = 'finanzas-mensuales-v1.0.2';
+const CACHE_NAME = 'finanzas-mensuales-v1.0.3';
 const urlsToCache = [
   '/',
   '/index.html',
   '/style.css',
   '/app.js',
   '/firebase-config.js',
-  '/manifest.json'
+  '/manifest.json',
+  '/public/icon-72.png',
+  '/public/icon-96.png',
+  '/public/icon-128.png',
+  '/public/icon-144.png',
+  '/public/icon-152.png',
+  '/public/icon-192.png',
+  '/public/icon-384.png',
+  '/public/icon-512.png'
 ];
 
 // Instalación del Service Worker

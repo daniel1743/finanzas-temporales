@@ -1792,14 +1792,7 @@ select.form-control {
 
 @media (max-width: 768px) {
   .btn-sync {
-    margin-left: 0;
-    margin-top: 12px;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .sync-text {
-    display: inline; /* Mostrar texto en móviles */
+    display: none; /* Ocultar en móviles - usar sidebar */
   }
 
   .auth-info {

@@ -364,3 +364,96 @@
 .bottom-nav {
     animation: slideInUp 0.3s ease;
 }
+
+/* ============================================
+   BOTÓN DE SINCRONIZACIÓN EN SIDEBAR
+   ============================================ */
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-sync-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.sidebar-sync-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, #059669, #047857);
+}
+
+.sidebar-sync-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.sidebar-sync-btn.syncing {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.sidebar-sync-btn.syncing .sync-icon-svg {
+    animation: rotate-sync 1s linear infinite;
+}
+
+.sync-icon-svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.sidebar-sync-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.app-sidebar:hover .sidebar-sync-text {
+    opacity: 1;
+    width: auto;
+}
+
+.app-sidebar:hover .sidebar-sync-btn {
+    justify-content: flex-start;
+}
+
+@media (max-width: 768px) {
+    .sidebar-footer {
+        position: static;
+        padding: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 2rem;
+    }
+
+    .sidebar-sync-btn {
+        justify-content: flex-start;
+        padding: 1rem 1.25rem;
+    }
+
+    .sidebar-sync-text {
+        opacity: 1;
+        width: auto;
+    }
+}

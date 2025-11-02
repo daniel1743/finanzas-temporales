@@ -2161,19 +2161,34 @@ async function handleLogout() {
 // FUNCIÓN DE SINCRONIZACIÓN MANUAL
 // ============================================
 
-async function syncDataNow() {
-  const btnSync = document.getElementById('btnSyncData');
-  if (!btnSync) return;
+async function syncDataNow(event) {
+  // Identificar qué botón llamó la función
+  const clickedButton = event?.currentTarget;
 
-  // Evitar múltiples clicks
-  if (btnSync.classList.contains('syncing')) return;
+  // Obtener todos los botones de sincronización
+  const buttons = {
+    header: document.getElementById('btnSyncData'),
+    sidebar: document.getElementById('btnSyncDataSidebar'),
+    config: document.getElementById('btnSyncDataConfig')
+  };
+
+  // Verificar si ya está sincronizando
+  const isSyncing = Object.values(buttons).some(btn => btn?.classList.contains('syncing'));
+  if (isSyncing) return;
 
   console.log('🔄 Sincronizando datos desde Firebase...');
 
-  // Añadir clase de sincronización
-  btnSync.classList.add('syncing');
-  const originalText = btnSync.querySelector('.sync-text').textContent;
-  btnSync.querySelector('.sync-text').textContent = 'Sincronizando...';
+  // Añadir clase de sincronización a todos los botones
+  Object.values(buttons).forEach(btn => {
+    if (btn) {
+      btn.classList.add('syncing');
+      const textEl = btn.querySelector('.sync-text') || btn.querySelector('.sidebar-sync-text');
+      if (textEl) {
+        textEl.setAttribute('data-original', textEl.textContent);
+        textEl.textContent = 'Sincronizando...';
+      }
+    }
+  });
 
   try {
     // Recargar datos desde Firestore
@@ -2197,6 +2212,14 @@ async function syncDataNow() {
       actualizarSugerencias();
       updateUI();
 
+      // Actualizar timestamp
+      const now = new Date();
+      const timeString = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+      const lastSyncEl = document.getElementById('lastSyncTime');
+      if (lastSyncEl) {
+        lastSyncEl.textContent = timeString;
+      }
+
       console.log('✅ Datos sincronizados correctamente');
       showToast('✅ Datos actualizados desde la nube', 'success');
     } else {
@@ -2207,19 +2230,39 @@ async function syncDataNow() {
     console.error('❌ Error al sincronizar:', error);
     showToast('❌ Error al sincronizar datos', 'error');
   } finally {
-    // Quitar clase de sincronización
+    // Quitar clase de sincronización de todos los botones
     setTimeout(() => {
-      btnSync.classList.remove('syncing');
-      btnSync.querySelector('.sync-text').textContent = originalText;
+      Object.values(buttons).forEach(btn => {
+        if (btn) {
+          btn.classList.remove('syncing');
+          const textEl = btn.querySelector('.sync-text') || btn.querySelector('.sidebar-sync-text');
+          if (textEl) {
+            const original = textEl.getAttribute('data-original');
+            if (original) {
+              textEl.textContent = original;
+              textEl.removeAttribute('data-original');
+            }
+          }
+        }
+      });
     }, 500);
   }
 }
 
-// Configurar event listener del botón de sincronización
+// Configurar event listeners de los botones de sincronización
 document.addEventListener('DOMContentLoaded', () => {
-  const btnSync = document.getElementById('btnSyncData');
-  if (btnSync) {
-    btnSync.addEventListener('click', syncDataNow);
+  const btnSyncHeader = document.getElementById('btnSyncData');
+  const btnSyncSidebar = document.getElementById('btnSyncDataSidebar');
+  const btnSyncConfig = document.getElementById('btnSyncDataConfig');
+
+  if (btnSyncHeader) {
+    btnSyncHeader.addEventListener('click', syncDataNow);
+  }
+  if (btnSyncSidebar) {
+    btnSyncSidebar.addEventListener('click', syncDataNow);
+  }
+  if (btnSyncConfig) {
+    btnSyncConfig.addEventListener('click', syncDataNow);
   }
 });
 

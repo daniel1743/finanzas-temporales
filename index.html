@@ -98,6 +98,16 @@
                 <span class="nav-label">Configuración</span>
             </a>
         </nav>
+
+        <!-- Botón de Sincronización en Sidebar -->
+        <div class="sidebar-footer">
+            <button class="sidebar-sync-btn" id="btnSyncDataSidebar" title="Sincronizar datos">
+                <svg class="sync-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <span class="sidebar-sync-text">Actualizar Datos</span>
+            </button>
+        </div>
     </aside>
 
     <!-- Bottom Navigation - Móvil -->
@@ -730,6 +740,25 @@
                 </div>
 
                 <div class="config-section">
+                    <h3>🔄 Sincronización de Datos</h3>
+                    <p>Mantén tus datos actualizados entre todos tus dispositivos</p>
+                    <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                        <p style="margin: 0 0 8px 0; color: #15803d; font-weight: 600;">
+                            📱 Sincronización en tiempo real
+                        </p>
+                        <p style="margin: 0; font-size: 14px; color: #166534;">
+                            Tus datos se sincronizan automáticamente con Firebase. Si un gasto se registra en otro dispositivo, usa este botón para verlo al instante.
+                        </p>
+                    </div>
+                    <button id="btnSyncDataConfig" class="btn btn--primary" style="width: 100%; font-size: 16px; padding: 14px;">
+                        🔄 Actualizar Datos Ahora
+                    </button>
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 12px; text-align: center;">
+                        Última sincronización: <span id="lastSyncTime">Nunca</span>
+                    </p>
+                </div>
+
+                <div class="config-section">
                     <h3>🔔 Notificaciones</h3>
                     <p>Configura recordatorios para registrar tus gastos diarios</p>
                     <div class="form-group">
@@ -1097,7 +1126,7 @@
 
                     await Promise.all(
                         cacheKeys.map(key => {
-                            if (!key.includes('v1.0.7')) { // Versión actual
+                            if (!key.includes('v1.0.8')) { // Versión actual
                                 console.log('🗑️ Eliminando caché:', key);
                                 return caches.delete(key);
                             }

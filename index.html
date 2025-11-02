@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="css/dashboard-enhanced.css">
     <link rel="stylesheet" href="css/sidebar-menu.css">
     <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/historial.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -263,8 +264,8 @@
 
     <!-- Navigation Tabs -->
     <nav class="app-nav">
-        <button class="nav-tab active" data-tab="registro">📝 Registro</button>
-        <button class="nav-tab" data-tab="dashboard">📊 Dashboard</button>
+        <button class="nav-tab active" data-tab="dashboard">📊 Dashboard</button>
+        <button class="nav-tab" data-tab="registro">📝 Registro</button>
         <button class="nav-tab" data-tab="transacciones">💳 Transacciones</button>
         <button class="nav-tab" data-tab="historial">📜 Historial</button>
         <button class="nav-tab" data-tab="configuracion">⚙️ Configuración</button>
@@ -273,7 +274,7 @@
     <!-- Main Content -->
     <main class="app-content">
         <!-- Tab 1: REGISTRO -->
-        <section id="registro" class="tab-content active">
+        <section id="registro" class="tab-content">
             <div class="section-header">
                 <h2>💰 Registro de Gastos e Ingresos</h2>
                 <p>Lleva el control de tus finanzas de manera sencilla y rápida.</p>
@@ -381,7 +382,7 @@
         </section>
 
         <!-- Tab 2: DASHBOARD -->
-        <section id="dashboard" class="tab-content">
+        <section id="dashboard" class="tab-content active">
             <div class="dashboard-header">
                 <div class="user-profile">
                     <div class="user-avatar">
@@ -473,21 +474,22 @@
                     </div>
                 </div>
 
-                <div class="stat-card">
+                <div class="stat-card stat-card-wide">
                     <div class="stat-icon stat-icon-5">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                            <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
                         </svg>
                     </div>
                     <div class="stat-content">
                         <div class="stat-header">
-                            <h3>Categoría Principal</h3>
-                            <button class="toggle-details" data-card="categoria">▼</button>
+                            <h3>📜 Últimos Movimientos</h3>
+                            <button class="toggle-details" data-card="movimientos">▼</button>
                         </div>
-                        <div class="stat-value" id="categoriaPrincipal" style="font-size: 1.5rem;">-</div>
-                        <div class="stat-details" id="categoriaDetails" style="display: none;">
-                            <p><strong>Monto gastado:</strong> <span id="montoCategoriaPrincipal">$0</span></p>
-                            <p><strong>Porcentaje del total:</strong> <span id="porcentajeCategoria">0%</span></p>
+                        <div class="stat-value" style="font-size: 1.2rem;" id="ultimosMovimientosResumen">Sin movimientos</div>
+                        <div class="stat-details" id="movimientosDetails" style="display: none;">
+                            <div id="miniHistorial" class="mini-historial">
+                                <p class="no-data">No hay movimientos registrados</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -854,6 +856,7 @@
     <script src="js/number-formatting.js"></script>
     <script src="js/sidebar-navigation.js"></script>
     <script src="js/navbar.js"></script>
+    <script src="js/historial.js"></script>
     <script type="module" src="js/currency-notifications.js"></script>
     <script type="module" src="js/integration.js"></script>
     <script type="module" src="firebase-config.js"></script>

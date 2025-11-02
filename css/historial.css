@@ -1,0 +1,391 @@
+/* ============================================
+   ESTILOS DEL HISTORIAL
+   ============================================ */
+
+/* Tarjeta ancha para últimos movimientos */
+.stat-card-wide {
+  grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+  .stat-card-wide {
+    grid-column: span 1;
+  }
+}
+
+/* Mini historial en dashboard */
+.mini-historial {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 12px;
+}
+
+.mini-historial::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mini-historial::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.mini-historial::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.mini-historial::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Entrada mini del historial */
+.mini-historial-entrada {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border-left: 3px solid #e5e7eb;
+  transition: all 0.2s;
+}
+
+.mini-historial-entrada:hover {
+  background: #f3f4f6;
+  transform: translateX(3px);
+}
+
+.mini-historial-entrada.ingreso {
+  border-left-color: #10b981;
+  background: linear-gradient(to right, #f0fdf4 0%, #f9fafb 30%);
+}
+
+.mini-historial-entrada.gasto {
+  border-left-color: #ef4444;
+  background: linear-gradient(to right, #fef2f2 0%, #f9fafb 30%);
+}
+
+.mini-historial-entrada.modificacion {
+  border-left-color: #f59e0b;
+  background: linear-gradient(to right, #fffbeb 0%, #f9fafb 30%);
+}
+
+.mini-historial-entrada.eliminacion {
+  border-left-color: #6b7280;
+  background: linear-gradient(to right, #f9fafb 0%, #ffffff 30%);
+}
+
+.mini-icono {
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mini-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mini-descripcion {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-monto {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4b5563;
+}
+
+.mini-historial-entrada.ingreso .mini-monto {
+  color: #059669;
+}
+
+.mini-historial-entrada.gasto .mini-monto {
+  color: #dc2626;
+}
+
+.mini-fecha {
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+/* Contenedor principal del historial */
+.historial-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+/* Entrada individual del historial */
+.historial-entrada {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 4px solid #e5e7eb;
+}
+
+.historial-entrada:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Colores según tipo */
+.historial-entrada.ingreso {
+  border-left-color: #10b981;
+  background: linear-gradient(to right, #f0fdf4 0%, white 20%);
+}
+
+.historial-entrada.gasto {
+  border-left-color: #ef4444;
+  background: linear-gradient(to right, #fef2f2 0%, white 20%);
+}
+
+.historial-entrada.modificacion {
+  border-left-color: #f59e0b;
+  background: linear-gradient(to right, #fffbeb 0%, white 20%);
+}
+
+.historial-entrada.eliminacion {
+  border-left-color: #6b7280;
+  background: linear-gradient(to right, #f9fafb 0%, white 20%);
+}
+
+/* Icono de la entrada */
+.historial-icono {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.historial-entrada.ingreso .historial-icono {
+  background: #d1fae5;
+}
+
+.historial-entrada.gasto .historial-icono {
+  background: #fee2e2;
+}
+
+.historial-entrada.modificacion .historial-icono {
+  background: #fef3c7;
+}
+
+.historial-entrada.eliminacion .historial-icono {
+  background: #e5e7eb;
+}
+
+/* Información de la entrada */
+.historial-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.historial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.historial-tipo {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #4b5563;
+  letter-spacing: 0.5px;
+}
+
+.historial-entrada.ingreso .historial-tipo {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.historial-entrada.gasto .historial-tipo {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.historial-entrada.modificacion .historial-tipo {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.historial-entrada.eliminacion .historial-tipo {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.historial-fecha {
+  font-size: 12px;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.historial-descripcion {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  line-height: 1.4;
+}
+
+.historial-detalles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.historial-detalles span {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #f9fafb;
+  color: #4b5563;
+}
+
+.detalle-monto {
+  font-weight: 600;
+  background: #eff6ff !important;
+  color: #1e40af !important;
+}
+
+.detalle-categoria {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.detalle-necesidad {
+  background: #fce7f3 !important;
+  color: #9f1239 !important;
+}
+
+.detalle-cambio {
+  background: #f0fdfa !important;
+  color: #115e59 !important;
+  font-size: 11px;
+}
+
+.historial-usuario {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+/* Resumen del historial */
+.historial-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.resumen-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.resumen-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.resumen-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+}
+
+.resumen-value.ingreso {
+  color: #6ee7b7;
+}
+
+.resumen-value.gasto {
+  color: #fca5a5;
+}
+
+/* Mensaje cuando no hay datos */
+.no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .historial-lista {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .historial-entrada {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .historial-icono {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .historial-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .historial-descripcion {
+    font-size: 13px;
+  }
+
+  .historial-resumen {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .resumen-value {
+    font-size: 20px;
+  }
+}

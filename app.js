@@ -20,6 +20,7 @@ let appData = {
   categorias: [],
   necesidades: [],
   transacciones: [],
+  historial: [], // Nuevo: historial de todas las acciones
   usuarioActual: 1,
   mesActual: '',
   configuracion: {}
@@ -478,6 +479,16 @@ function handleRegistroSubmit(e) {
     };
 
     appData.transacciones.push(transaccion);
+
+    // Registrar en historial
+    if (typeof window.registrarEnHistorial === 'function') {
+      window.registrarEnHistorial('gasto', `Gasto registrado: ${descripcion}`, {
+        monto: montoGasto,
+        categoria: categoria,
+        necesidad: selectedNecesidad
+      });
+    }
+
     saveAppData();
 
     // Actualizar UI y dashboard
@@ -510,9 +521,23 @@ function actualizarIngresos() {
 
   const usuario = appData.usuarios.find(u => u.id === appData.usuarioActual);
   if (usuario) {
+    const anteriorBase = usuario.ingresoBase || 0;
+    const anteriorExtra = usuario.ingresoExtra || 0;
+
     usuario.ingresoBase = ingresoBase;
     usuario.ingresoExtra = ingresoExtra;
     console.log('Usuario actualizado:', usuario);
+
+    // Registrar en historial si hubo cambios
+    if (typeof window.registrarEnHistorial === 'function') {
+      if (anteriorBase !== ingresoBase || anteriorExtra !== ingresoExtra) {
+        window.registrarEnHistorial('modificacion', 'Ingresos actualizados', {
+          anterior: `Base: ${formatCLP(anteriorBase)}, Extra: ${formatCLP(anteriorExtra)}`,
+          nuevo: `Base: ${formatCLP(ingresoBase)}, Extra: ${formatCLP(ingresoExtra)}`
+        });
+      }
+    }
+
     saveAppData();
 
     // Actualizar UI completa
@@ -545,6 +570,23 @@ function agregarIngreso() {
   // Sumar los ingresos al acumulado
   const totalNuevoIngreso = ingresoBase + ingresoExtra;
   usuario.ingresosAcumulados = (usuario.ingresosAcumulados || 0) + totalNuevoIngreso;
+
+  // Registrar en historial
+  if (typeof window.registrarEnHistorial === 'function') {
+    let detalleIngreso = '';
+    if (ingresoBase > 0 && ingresoExtra > 0) {
+      detalleIngreso = `Base: ${formatCLP(ingresoBase)}, Extra: ${formatCLP(ingresoExtra)}`;
+    } else if (ingresoBase > 0) {
+      detalleIngreso = `Base: ${formatCLP(ingresoBase)}`;
+    } else {
+      detalleIngreso = `Extra: ${formatCLP(ingresoExtra)}`;
+    }
+
+    window.registrarEnHistorial('ingreso', `Ingreso agregado: ${formatCLP(totalNuevoIngreso)}`, {
+      monto: totalNuevoIngreso,
+      categoria: detalleIngreso
+    });
+  }
 
   // Limpiar los campos
   document.getElementById('ingresoBase').value = '';
@@ -595,10 +637,22 @@ function handleGastoRapido(e) {
       // EDITAR transacción existente
       const transaccion = appData.transacciones.find(t => t.id == transaccionId);
       if (transaccion) {
+        const cambios = [];
+        if (transaccion.monto !== monto) cambios.push(`Monto: ${formatCLP(transaccion.monto)} → ${formatCLP(monto)}`);
+        if (transaccion.descripcion !== descripcion) cambios.push(`Descripción: "${transaccion.descripcion}" → "${descripcion}"`);
+        if (transaccion.categoria !== categoria) cambios.push(`Categoría: ${transaccion.categoria} → ${categoria}`);
+
         transaccion.monto = monto;
         transaccion.descripcion = descripcion;
         transaccion.categoria = categoria;
         transaccion.esGastoRapido = esGastoRapido;
+
+        // Registrar en historial
+        if (cambios.length > 0 && typeof window.registrarEnHistorial === 'function') {
+          window.registrarEnHistorial('modificacion', `Gasto rápido modificado: ${descripcion}`, {
+            anterior: cambios.join(', ')
+          });
+        }
 
         saveAppData();
         showToast('Gasto actualizado correctamente', 'success');
@@ -621,6 +675,15 @@ function handleGastoRapido(e) {
       };
 
       appData.transacciones.push(transaccion);
+
+      // Registrar en historial
+      if (typeof window.registrarEnHistorial === 'function') {
+        window.registrarEnHistorial('gasto', `Gasto rápido agregado: ${descripcion}`, {
+          monto: monto,
+          categoria: categoria
+        });
+      }
+
       saveAppData();
       showToast('Gasto agregado correctamente', 'success');
     }
@@ -848,6 +911,11 @@ function updateDashboard() {
 
     // Actualizar gráficos
     updateCharts(transaccionesMes);
+
+    // Actualizar mini historial de últimos 10 movimientos
+    if (typeof window.actualizarMiniHistorial === 'function') {
+      window.actualizarMiniHistorial();
+    }
   } catch (error) {
     console.error('Error al actualizar dashboard:', error);
     showToast('Error al cargar el dashboard', 'error');
@@ -859,10 +927,79 @@ function updateDashboard() {
 // ============================================
 
 function initializeCharts() {
+  console.log('📊 Inicializando gráficos...');
+
+  // ====== DESTRUIR GRÁFICOS EXISTENTES PRIMERO ======
+  // Esto previene el error "Canvas is already in use"
+  console.log('🧹 Destruyendo gráficos previos si existen...');
+
+  if (chartInstances.pie) {
+    try {
+      chartInstances.pie.destroy();
+      console.log('   ✅ chartInstances.pie destruido');
+    } catch (e) {
+      console.warn('   ⚠️ Error al destruir pie:', e.message);
+    }
+  }
+
+  if (chartInstances.bar) {
+    try {
+      chartInstances.bar.destroy();
+      console.log('   ✅ chartInstances.bar destruido');
+    } catch (e) {
+      console.warn('   ⚠️ Error al destruir bar:', e.message);
+    }
+  }
+
+  if (chartInstances.radar) {
+    try {
+      chartInstances.radar.destroy();
+      console.log('   ✅ chartInstances.radar destruido');
+    } catch (e) {
+      console.warn('   ⚠️ Error al destruir radar:', e.message);
+    }
+  }
+
+  if (chartInstances.line) {
+    try {
+      chartInstances.line.destroy();
+      console.log('   ✅ chartInstances.line destruido');
+    } catch (e) {
+      console.warn('   ⚠️ Error al destruir line:', e.message);
+    }
+  }
+
+  if (chartInstances.balanceDoughnut) {
+    try {
+      chartInstances.balanceDoughnut.destroy();
+      console.log('   ✅ chartInstances.balanceDoughnut destruido');
+    } catch (e) {
+      console.warn('   ⚠️ Error al destruir balanceDoughnut:', e.message);
+    }
+  }
+
+  if (chartInstances.userComparison) {
+    try {
+      chartInstances.userComparison.destroy();
+      console.log('   ✅ chartInstances.userComparison destruido');
+    } catch (e) {
+      console.warn('   ⚠️ Error al destruir userComparison:', e.message);
+    }
+  }
+
+  console.log('✅ Gráficos previos destruidos, creando nuevos...');
+
   const colors = ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F', '#DB4545', '#D2BA4C', '#964325', '#944454', '#13343B'];
-  
+
+  // Verificar que los canvas existan antes de crear gráficos
+  const chartPieCanvas = document.getElementById('chartPie');
+  if (!chartPieCanvas) {
+    console.warn('⚠️ Canvas chartPie no encontrado, saltando inicialización de gráficos');
+    return;
+  }
+
   // Gráfico de pastel - Gastos por categoría
-  const ctxPie = document.getElementById('chartPie').getContext('2d');
+  const ctxPie = chartPieCanvas.getContext('2d');
   chartInstances.pie = new Chart(ctxPie, {
     type: 'pie',
     data: {
@@ -1253,7 +1390,17 @@ function editarTransaccion(id) {
     // Para gastos normales, solo permitir editar el monto
     const nuevoMonto = prompt('Nuevo monto:', transaccion.monto);
     if (nuevoMonto && !isNaN(nuevoMonto)) {
+      const montoAnterior = transaccion.monto;
       transaccion.monto = parseFloat(nuevoMonto);
+
+      // Registrar en historial
+      if (typeof window.registrarEnHistorial === 'function') {
+        window.registrarEnHistorial('modificacion', `Monto modificado: ${transaccion.descripcion}`, {
+          anterior: formatCLP(montoAnterior),
+          nuevo: formatCLP(transaccion.monto)
+        });
+      }
+
       saveAppData();
       updateTransacciones();
       showToast('Transacción actualizada', 'success');
@@ -1288,7 +1435,20 @@ function resetearModalRapido() {
 
 function eliminarTransaccion(id) {
   if (confirm('¿Estás seguro de eliminar esta transacción?')) {
+    // Guardar info antes de eliminar para el historial
+    const transaccion = appData.transacciones.find(t => t.id === id);
+
     appData.transacciones = appData.transacciones.filter(t => t.id !== id);
+
+    // Registrar en historial
+    if (transaccion && typeof window.registrarEnHistorial === 'function') {
+      window.registrarEnHistorial('eliminacion', `Transacción eliminada: ${transaccion.descripcion}`, {
+        monto: transaccion.monto,
+        categoria: transaccion.categoria,
+        necesidad: transaccion.necesidad
+      });
+    }
+
     saveAppData();
     updateTransacciones();
     updateUI();

@@ -11,7 +11,8 @@ import {
   registerWithEmail,
   loginWithEmail,
   logoutUser,
-  continueAnonymously
+  continueAnonymously,
+  getCurrentUser
 } from './firebase-config.js';
 
 // Variables globales para almacenar datos
@@ -2034,6 +2035,15 @@ async function initializeAppAfterAuth() {
     await initializeApp();
     setupEventListeners();
     updateUI();
+
+    // Actualizar información del usuario en el header
+    updateUserInfoDisplay();
+
+    // Agregar event listener al botón de cuenta
+    const btnAccount = document.getElementById('btnAccount');
+    if (btnAccount) {
+      btnAccount.addEventListener('click', openAccountModal);
+    }
   } catch (error) {
     console.error('Error después de autenticar:', error);
     showToast('Error al cargar la aplicación', 'error');
@@ -2060,3 +2070,94 @@ function getErrorMessage(error) {
 
   return 'Error al autenticar. Intenta de nuevo.';
 }
+
+// ============================================
+// FUNCIONES PARA MODAL DE CUENTA
+// ============================================
+
+function updateUserInfoDisplay() {
+  const user = getCurrentUser();
+  const authInfo = document.getElementById('authInfo');
+  const userEmailDisplay = document.getElementById('userEmailDisplay');
+
+  if (user && authInfo && userEmailDisplay) {
+    // Mostrar botón de cuenta
+    authInfo.style.display = 'block';
+
+    // Mostrar email o indicar que es anónimo
+    if (user.email) {
+      userEmailDisplay.textContent = user.email;
+    } else if (user.isAnonymous) {
+      userEmailDisplay.textContent = 'Invitado';
+    } else {
+      userEmailDisplay.textContent = 'Usuario';
+    }
+  }
+}
+
+function openAccountModal() {
+  const user = getCurrentUser();
+  const modal = document.getElementById('accountModal');
+  const accountEmail = document.getElementById('accountEmail');
+  const accountUID = document.getElementById('accountUID');
+  const accountType = document.getElementById('accountType');
+
+  if (user && modal) {
+    // Llenar información
+    if (user.email) {
+      accountEmail.textContent = user.email;
+      accountType.textContent = '✅ Cuenta con Email';
+    } else if (user.isAnonymous) {
+      accountEmail.textContent = 'Sin email registrado';
+      accountType.textContent = '👤 Usuario Anónimo';
+    } else {
+      accountEmail.textContent = '-';
+      accountType.textContent = 'Usuario';
+    }
+
+    accountUID.textContent = user.uid;
+
+    // Mostrar modal
+    modal.classList.add('active');
+  }
+}
+
+function closeAccountModal() {
+  const modal = document.getElementById('accountModal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+async function handleLogout() {
+  const confirmLogout = confirm('¿Estás seguro de que deseas cerrar sesión? Tus datos están sincronizados en la nube.');
+
+  if (confirmLogout) {
+    showToast('Cerrando sesión...', 'info');
+
+    const result = await logoutUser();
+
+    if (result.success) {
+      // Limpiar localStorage
+      localStorage.removeItem('autoLogin');
+      localStorage.removeItem('savedEmail');
+
+      showToast('Sesión cerrada. Hasta pronto!', 'success');
+
+      // Cerrar modal de cuenta
+      closeAccountModal();
+
+      // Recargar página para mostrar modal de login
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } else {
+      showToast('Error al cerrar sesión', 'error');
+    }
+  }
+}
+
+// Hacer funciones globales para que puedan ser llamadas desde HTML
+window.openAccountModal = openAccountModal;
+window.closeAccountModal = closeAccountModal;
+window.handleLogout = handleLogout;

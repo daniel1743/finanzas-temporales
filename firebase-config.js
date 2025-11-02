@@ -183,11 +183,17 @@ async function continueAnonymously() {
   }
 }
 
+// Función para obtener el currentUser actualizado
+function getCurrentUser() {
+  return currentUser;
+}
+
 // Exportar funciones y variables
 export {
   auth,
   db,
   currentUser,
+  getCurrentUser,
   initializeFirebaseAuth,
   saveToFirestore,
   loadFromFirestore,

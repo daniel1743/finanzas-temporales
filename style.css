@@ -1653,3 +1653,98 @@ select.form-control {
     height: 60px;
   }
 }
+
+/* ============================================
+   BOTÓN DE CUENTA Y MODAL
+   ============================================ */
+
+.auth-info {
+  margin-left: 16px;
+}
+
+.btn-account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
+  color: white;
+  border: none;
+  border-radius: var(--radius-base);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(var(--color-teal-500-rgb), 0.3);
+}
+
+.btn-account:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--color-teal-500-rgb), 0.4);
+  background: linear-gradient(135deg, var(--color-teal-600), var(--color-teal-700));
+}
+
+.btn-account:active {
+  transform: translateY(0);
+}
+
+.account-icon {
+  font-size: 18px;
+}
+
+#userEmailDisplay {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-info-card {
+  background: var(--color-bg-1);
+  border-radius: var(--radius-base);
+  padding: 16px;
+  border: 1px solid rgba(var(--color-teal-500-rgb), 0.2);
+}
+
+.account-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(var(--color-slate-500-rgb), 0.1);
+}
+
+.account-row:last-child {
+  border-bottom: none;
+}
+
+.account-label {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.account-value {
+  font-weight: 500;
+  color: var(--color-text);
+  font-size: 14px;
+  text-align: right;
+  max-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .auth-info {
+    margin-left: 0;
+    margin-top: 12px;
+    width: 100%;
+  }
+
+  .btn-account {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #userEmailDisplay {
+    max-width: none;
+  }
+}

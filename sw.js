@@ -1,5 +1,5 @@
 // Service Worker para PWA - Finanzas Mensuales
-const CACHE_VERSION = 'v1.0.9';
+const CACHE_VERSION = 'v1.1.0';
 const CACHE_NAME = `finanzas-mensuales-${CACHE_VERSION}`;
 const urlsToCache = [
   '/',

@@ -202,7 +202,15 @@ function initializeDefaultData() {
   }
 
   if (appData.necesidades.length === 0) {
-    appData.necesidades = ['Baja', 'Media', 'Alta', 'Crítica'];
+    appData.necesidades = [
+      'Muy necesario',
+      'Necesario',
+      'Poco necesario',
+      'Nada necesario',
+      'Innecesario',
+      'Impulso',
+      'Arrepentimiento'
+    ];
   }
 
   if (appData.transacciones.length === 0) {

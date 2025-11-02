@@ -342,10 +342,13 @@
                         <div class="form-group">
                             <label class="form-label">Nivel de Necesidad *</label>
                             <div class="necessity-buttons">
-                                <button type="button" class="necessity-btn" data-level="Baja">Baja</button>
-                                <button type="button" class="necessity-btn" data-level="Media">Media</button>
-                                <button type="button" class="necessity-btn" data-level="Alta">Alta</button>
-                                <button type="button" class="necessity-btn" data-level="Crítica">Crítica</button>
+                                <button type="button" class="necessity-btn" data-level="Muy necesario">Muy necesario</button>
+                                <button type="button" class="necessity-btn" data-level="Necesario">Necesario</button>
+                                <button type="button" class="necessity-btn" data-level="Poco necesario">Poco necesario</button>
+                                <button type="button" class="necessity-btn" data-level="Nada necesario">Nada necesario</button>
+                                <button type="button" class="necessity-btn" data-level="Innecesario">Innecesario</button>
+                                <button type="button" class="necessity-btn" data-level="Impulso">Impulso</button>
+                                <button type="button" class="necessity-btn" data-level="Arrepentimiento">Arrepentimiento</button>
                                 <button type="button" class="necessity-btn-add" id="addNecesidad">+ Agregar personalizada</button>
                             </div>
                         </div>
@@ -1128,7 +1131,7 @@
 
                     await Promise.all(
                         cacheKeys.map(key => {
-                            if (!key.includes('v1.0.9')) { // Versión actual
+                            if (!key.includes('v1.1.0')) { // Versión actual
                                 console.log('🗑️ Eliminando caché:', key);
                                 return caches.delete(key);
                             }

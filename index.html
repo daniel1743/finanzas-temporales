@@ -258,6 +258,10 @@
                         <option value="new">+ Agregar nuevo usuario</option>
                     </select>
                 </div>
+                <button class="btn-sync" id="btnSyncData" title="Sincronizar datos desde Firebase">
+                    <span class="sync-icon">🔄</span>
+                    <span class="sync-text">Actualizar</span>
+                </button>
                 <div class="auth-info" id="authInfo" style="display: none;">
                     <button class="btn-account" id="btnAccount" title="Cuenta">
                         <span id="userEmailDisplay"></span>
@@ -288,32 +292,6 @@
 
             <div class="form-container">
                 <form id="registroForm">
-                    <!-- Ingresos -->
-                    <div class="form-section">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3 style="margin: 0;">💵 Ingresos del Mes</h3>
-                            <button type="button" id="btnAgregarIngreso" class="btn btn--primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
-                                ➕ Agregar Ingreso
-                            </button>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="ingresoBase" class="form-label">Ingreso Principal *</label>
-                                <input type="number" id="ingresoBase" class="form-control" placeholder="$0" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label for="ingresoExtra" class="form-label">Ingreso Extra</label>
-                                <input type="number" id="ingresoExtra" class="form-control" placeholder="$0" min="0">
-                            </div>
-                        </div>
-                        <div id="ingresosAgregados" style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 0.5rem; display: none;">
-                            <p style="font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📊 Ingresos acumulados:</p>
-                            <p style="color: #6b7280; margin: 0;">
-                                <strong>Total de ingresos agregados:</strong> <span id="totalIngresosAcumulados" style="color: #059669; font-weight: 700;">$0</span>
-                            </p>
-                        </div>
-                    </div>
-
                     <!-- Gastos -->
                     <div class="form-section">
                         <h3>💸 Registrar Gasto</h3>
@@ -376,6 +354,32 @@
                         <div class="form-group">
                             <label for="notas" class="form-label">Notas adicionales (opcional)</label>
                             <textarea id="notas" class="form-control" rows="3" placeholder="Cualquier información adicional..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Ingresos del Mes (al final para evitar confusiones) -->
+                    <div class="form-section" style="border-top: 2px solid #e5e7eb; padding-top: 1.5rem; margin-top: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 style="margin: 0;">💵 Ingresos del Mes (Opcional)</h3>
+                            <button type="button" id="btnAgregarIngreso" class="btn btn--primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                                ➕ Agregar Ingreso
+                            </button>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ingresoBase" class="form-label">Ingreso Principal</label>
+                                <input type="number" id="ingresoBase" class="form-control" placeholder="$0" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="ingresoExtra" class="form-label">Ingreso Extra</label>
+                                <input type="number" id="ingresoExtra" class="form-control" placeholder="$0" min="0">
+                            </div>
+                        </div>
+                        <div id="ingresosAgregados" style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 0.5rem; display: none;">
+                            <p style="font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📊 Ingresos acumulados:</p>
+                            <p style="color: #6b7280; margin: 0;">
+                                <strong>Total de ingresos agregados:</strong> <span id="totalIngresosAcumulados" style="color: #059669; font-weight: 700;">$0</span>
+                            </p>
                         </div>
                     </div>
 
@@ -936,22 +940,23 @@
         <div class="update-modal-content">
             <div class="update-icon-wrapper">
                 <div class="update-icon-pulse"></div>
-                <span class="update-icon">🔄</span>
+                <span class="update-icon">✨</span>
             </div>
-            <h3 class="update-title">¿Limpiar caché y actualizar métricas?</h3>
+            <h3 class="update-title">Nueva versión disponible</h3>
             <p class="update-message">
-                Actualiza la aplicación para ver las últimas métricas de tus gastos sincronizadas desde todos tus dispositivos.
+                Hay una nueva actualización con mejoras y correcciones.
+                <br>¿Deseas instalarla ahora?
             </p>
             <div class="update-actions">
                 <button class="btn-update-dismiss" id="btnUpdateDismiss">
                     Más tarde
                 </button>
                 <button class="btn-update-confirm" id="btnUpdateConfirm">
-                    🧹 Limpiar y actualizar
+                    ✨ Actualizar ahora
                 </button>
             </div>
             <p class="update-info">
-                Se limpiará la caché local y se cargarán los datos más recientes
+                Se aplicarán las últimas mejoras y se limpiará la caché
             </p>
         </div>
     </div>
@@ -1071,7 +1076,7 @@
         }
 
         async function applyUpdate() {
-            console.log('🚀 Aplicando actualización...');
+            console.log('🚀 Aplicando actualización de código...');
 
             if (!newWorker) {
                 console.error('❌ No hay Service Worker nuevo disponible');
@@ -1085,14 +1090,14 @@
             btnConfirm.textContent = '⏳ Actualizando...';
 
             try {
-                // 1. Limpiar caché del navegador
+                // 1. Limpiar cachés antiguos del navegador
                 if ('caches' in window) {
                     const cacheKeys = await caches.keys();
                     console.log('🧹 Limpiando cachés antiguos:', cacheKeys);
 
                     await Promise.all(
                         cacheKeys.map(key => {
-                            if (!key.includes('v1.0.5')) { // Versión actual
+                            if (!key.includes('v1.0.7')) { // Versión actual
                                 console.log('🗑️ Eliminando caché:', key);
                                 return caches.delete(key);
                             }
@@ -1100,21 +1105,7 @@
                     );
                 }
 
-                // 2. Limpiar localStorage de datos temporales (NO credenciales)
-                const keysToKeep = ['autoLogin', 'savedEmail', 'rememberMe'];
-                const allKeys = Object.keys(localStorage);
-
-                allKeys.forEach(key => {
-                    if (!keysToKeep.includes(key)) {
-                        console.log('🗑️ Limpiando localStorage:', key);
-                        localStorage.removeItem(key);
-                    }
-                });
-
-                // 3. Marcar que se debe recargar datos de Firebase
-                sessionStorage.setItem('forceReloadData', 'true');
-
-                // 4. Enviar mensaje al SW para que se active inmediatamente
+                // 2. Enviar mensaje al SW para que se active inmediatamente
                 newWorker.postMessage({ type: 'SKIP_WAITING' });
 
                 console.log('⏳ Esperando activación del nuevo Service Worker...');

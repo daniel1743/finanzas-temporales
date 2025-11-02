@@ -101,17 +101,8 @@ async function initializeApp() {
 
 async function loadAppData() {
   try {
-    // Verificar si se debe forzar la recarga desde Firebase
-    const forceReload = sessionStorage.getItem('forceReloadData');
-    if (forceReload === 'true') {
-      console.log('🔄 Forzando recarga de datos desde Firebase...');
-      sessionStorage.removeItem('forceReloadData');
-      // Limpiar localStorage de datos
-      localStorage.removeItem('finanzasAppData');
-    }
-
     if (useFirebase) {
-      // Intentar cargar desde Firestore primero (siempre)
+      // Siempre intentar cargar desde Firestore primero (sincronización automática)
       const firestoreData = await loadFromFirestore();
 
       if (firestoreData) {
@@ -120,14 +111,7 @@ async function loadAppData() {
           ...firestoreData
         };
         window.appData = appData; // Sincronizar con window
-        console.log('📊 Datos cargados desde Firestore');
-
-        // Si se forzó la recarga, mostrar notificación
-        if (forceReload === 'true') {
-          setTimeout(() => {
-            showToast('✅ Datos actualizados desde la nube', 'success');
-          }, 1000);
-        }
+        console.log('📊 Datos sincronizados desde Firestore');
       } else {
         // Si no hay datos en Firestore, intentar localStorage
         const localData = localStorage.getItem('finanzasAppData');
@@ -2173,7 +2157,74 @@ async function handleLogout() {
   }
 }
 
+// ============================================
+// FUNCIÓN DE SINCRONIZACIÓN MANUAL
+// ============================================
+
+async function syncDataNow() {
+  const btnSync = document.getElementById('btnSyncData');
+  if (!btnSync) return;
+
+  // Evitar múltiples clicks
+  if (btnSync.classList.contains('syncing')) return;
+
+  console.log('🔄 Sincronizando datos desde Firebase...');
+
+  // Añadir clase de sincronización
+  btnSync.classList.add('syncing');
+  const originalText = btnSync.querySelector('.sync-text').textContent;
+  btnSync.querySelector('.sync-text').textContent = 'Sincronizando...';
+
+  try {
+    // Recargar datos desde Firestore
+    const firestoreData = await loadFromFirestore();
+
+    if (firestoreData) {
+      // Actualizar datos en memoria
+      appData = {
+        ...appData,
+        ...firestoreData
+      };
+      window.appData = appData;
+
+      // Guardar en localStorage como backup
+      localStorage.setItem('finanzasAppData', JSON.stringify(appData));
+
+      // Actualizar UI completa
+      updateUserSelects();
+      updateCategorySelects();
+      renderNecessityButtons();
+      actualizarSugerencias();
+      updateUI();
+
+      console.log('✅ Datos sincronizados correctamente');
+      showToast('✅ Datos actualizados desde la nube', 'success');
+    } else {
+      console.log('⚠️ No hay datos en Firestore para este usuario');
+      showToast('⚠️ No se encontraron datos en la nube', 'info');
+    }
+  } catch (error) {
+    console.error('❌ Error al sincronizar:', error);
+    showToast('❌ Error al sincronizar datos', 'error');
+  } finally {
+    // Quitar clase de sincronización
+    setTimeout(() => {
+      btnSync.classList.remove('syncing');
+      btnSync.querySelector('.sync-text').textContent = originalText;
+    }, 500);
+  }
+}
+
+// Configurar event listener del botón de sincronización
+document.addEventListener('DOMContentLoaded', () => {
+  const btnSync = document.getElementById('btnSyncData');
+  if (btnSync) {
+    btnSync.addEventListener('click', syncDataNow);
+  }
+});
+
 // Hacer funciones globales para que puedan ser llamadas desde HTML
 window.openAccountModal = openAccountModal;
 window.closeAccountModal = closeAccountModal;
 window.handleLogout = handleLogout;
+window.syncDataNow = syncDataNow;

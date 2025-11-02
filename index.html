@@ -76,12 +76,13 @@
                 <span class="nav-label">Registro</span>
             </a>
 
-            <a class="sidebar-nav-item" data-nav="transacciones">
+            <!-- Transacciones - Temporalmente deshabilitado -->
+            <!-- <a class="sidebar-nav-item" data-nav="transacciones">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                 </svg>
                 <span class="nav-label">Transacciones</span>
-            </a>
+            </a> -->
 
             <a class="sidebar-nav-item" data-nav="historial">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -127,12 +128,13 @@
                 <span class="bottom-nav-label">Registro</span>
             </a>
 
-            <a class="bottom-nav-item" data-nav="transacciones">
+            <!-- Transacciones - Temporalmente deshabilitado -->
+            <!-- <a class="bottom-nav-item" data-nav="transacciones">
                 <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                 </svg>
                 <span class="bottom-nav-label">Transacciones</span>
-            </a>
+            </a> -->
 
             <a class="bottom-nav-item" data-nav="historial">
                 <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -286,7 +288,7 @@
     <nav class="app-nav">
         <button class="nav-tab active" data-tab="dashboard">📊 Dashboard</button>
         <button class="nav-tab" data-tab="registro">📝 Registro</button>
-        <button class="nav-tab" data-tab="transacciones">💳 Transacciones</button>
+        <!-- <button class="nav-tab" data-tab="transacciones">💳 Transacciones</button> -->
         <button class="nav-tab" data-tab="historial">📜 Historial</button>
         <button class="nav-tab" data-tab="configuracion">⚙️ Configuración</button>
     </nav>
@@ -1126,7 +1128,7 @@
 
                     await Promise.all(
                         cacheKeys.map(key => {
-                            if (!key.includes('v1.0.8')) { // Versión actual
+                            if (!key.includes('v1.0.9')) { // Versión actual
                                 console.log('🗑️ Eliminando caché:', key);
                                 return caches.delete(key);
                             }

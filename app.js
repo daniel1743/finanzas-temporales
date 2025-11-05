@@ -1612,13 +1612,19 @@ function updateHistorial() {
 function renderHistorialMes(contentId, resumenId, transacciones) {
   const content = document.getElementById(contentId);
   const resumen = document.getElementById(resumenId);
-  
+
+  // Validar que los elementos existan antes de intentar actualizarlos
+  if (!content || !resumen) {
+    console.warn(`⚠️ Elementos ${contentId} o ${resumenId} no encontrados en el DOM`);
+    return;
+  }
+
   if (transacciones.length === 0) {
     content.innerHTML = '<p class="no-data">No hay datos para este mes</p>';
     resumen.innerHTML = '';
     return;
   }
-  
+
   content.innerHTML = '';
   transacciones.forEach(t => {
     const item = document.createElement('div');

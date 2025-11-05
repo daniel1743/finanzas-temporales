@@ -304,103 +304,110 @@
 
             <div class="form-container">
                 <form id="registroForm">
-                    <!-- Gastos -->
-                    <div class="form-section">
-                        <h3>💸 Registrar Gasto</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="montoGasto" class="form-label">Monto del Gasto *</label>
-                                <input type="number" id="montoGasto" class="form-control" placeholder="$0" min="0" required>
+                    <!-- CONTENEDOR 1: REGISTRAR GASTO -->
+                    <div class="registro-container" style="background: white; border: 2px solid #0d9488; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.1);">
+                        <div class="form-section">
+                            <h3 style="color: #0d9488; margin-bottom: 1rem;">💸 Registrar Gasto</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="montoGasto" class="form-label">Monto del Gasto *</label>
+                                    <input type="number" id="montoGasto" class="form-control" placeholder="$0" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="descripcionGasto" class="form-label">Descripción *</label>
+                                    <input type="text" id="descripcionGasto" class="form-control" placeholder="Ej: Supermercado" list="descripcionesSugeridasPrincipal" autocomplete="off" required>
+                                    <datalist id="descripcionesSugeridasPrincipal"></datalist>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="descripcionGasto" class="form-label">Descripción *</label>
-                                <input type="text" id="descripcionGasto" class="form-control" placeholder="Ej: Supermercado" list="descripcionesSugeridasPrincipal" autocomplete="off" required>
-                                <datalist id="descripcionesSugeridasPrincipal"></datalist>
-                            </div>
-                        </div>
 
-                        <div class="form-row">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="categoria" class="form-label">Categoría *</label>
+                                    <select id="categoria" class="form-control" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Alimentación 🍞">Alimentación 🍞</option>
+                                        <option value="Transporte 🚗">Transporte 🚗</option>
+                                        <option value="Entretenimiento 🎬">Entretenimiento 🎬</option>
+                                        <option value="Salud 💊">Salud 💊</option>
+                                        <option value="Educación 📚">Educación 📚</option>
+                                        <option value="Otro ➕">Otro ➕</option>
+                                        <option value="nueva">+ Agregar nueva categoría</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fechaGasto" class="form-label">Fecha *</label>
+                                    <input type="date" id="fechaGasto" class="form-control" required>
+                                </div>
+                            </div>
+
                             <div class="form-group">
-                                <label for="categoria" class="form-label">Categoría *</label>
-                                <select id="categoria" class="form-control" required>
-                                    <option value="">Seleccionar...</option>
-                                    <option value="Alimentación 🍞">Alimentación 🍞</option>
-                                    <option value="Transporte 🚗">Transporte 🚗</option>
-                                    <option value="Entretenimiento 🎬">Entretenimiento 🎬</option>
-                                    <option value="Salud 💊">Salud 💊</option>
-                                    <option value="Educación 📚">Educación 📚</option>
-                                    <option value="Otro ➕">Otro ➕</option>
-                                    <option value="nueva">+ Agregar nueva categoría</option>
+                                <label class="form-label">Nivel de Necesidad *</label>
+                                <div class="necessity-buttons">
+                                    <button type="button" class="necessity-btn" data-level="Muy necesario">Muy necesario</button>
+                                    <button type="button" class="necessity-btn" data-level="Necesario">Necesario</button>
+                                    <button type="button" class="necessity-btn" data-level="Poco necesario">Poco necesario</button>
+                                    <button type="button" class="necessity-btn" data-level="Nada necesario">Nada necesario</button>
+                                    <button type="button" class="necessity-btn" data-level="Innecesario">Innecesario</button>
+                                    <button type="button" class="necessity-btn" data-level="Impulso">Impulso</button>
+                                    <button type="button" class="necessity-btn" data-level="Arrepentimiento">Arrepentimiento</button>
+                                    <button type="button" class="necessity-btn-add" id="addNecesidad">+ Agregar personalizada</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="usuarioGasto" class="form-label">Usuario *</label>
+                                <select id="usuarioGasto" class="form-control" required>
+                                    <option value="Daniel">Daniel</option>
+                                    <option value="Pareja">Pareja</option>
                                 </select>
                             </div>
+
                             <div class="form-group">
-                                <label for="fechaGasto" class="form-label">Fecha *</label>
-                                <input type="date" id="fechaGasto" class="form-control" required>
+                                <label for="items" class="form-label">Items de compra (opcional)</label>
+                                <textarea id="items" class="form-control" rows="3" placeholder="Ej: Arroz, Aceite, Pan..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="notas" class="form-label">Notas adicionales (opcional)</label>
+                                <textarea id="notas" class="form-control" rows="3" placeholder="Cualquier información adicional..."></textarea>
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Nivel de Necesidad *</label>
-                            <div class="necessity-buttons">
-                                <button type="button" class="necessity-btn" data-level="Muy necesario">Muy necesario</button>
-                                <button type="button" class="necessity-btn" data-level="Necesario">Necesario</button>
-                                <button type="button" class="necessity-btn" data-level="Poco necesario">Poco necesario</button>
-                                <button type="button" class="necessity-btn" data-level="Nada necesario">Nada necesario</button>
-                                <button type="button" class="necessity-btn" data-level="Innecesario">Innecesario</button>
-                                <button type="button" class="necessity-btn" data-level="Impulso">Impulso</button>
-                                <button type="button" class="necessity-btn" data-level="Arrepentimiento">Arrepentimiento</button>
-                                <button type="button" class="necessity-btn-add" id="addNecesidad">+ Agregar personalizada</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="usuarioGasto" class="form-label">Usuario *</label>
-                            <select id="usuarioGasto" class="form-control" required>
-                                <option value="Daniel">Daniel</option>
-                                <option value="Pareja">Pareja</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="items" class="form-label">Items de compra (opcional)</label>
-                            <textarea id="items" class="form-control" rows="3" placeholder="Ej: Arroz, Aceite, Pan..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="notas" class="form-label">Notas adicionales (opcional)</label>
-                            <textarea id="notas" class="form-control" rows="3" placeholder="Cualquier información adicional..."></textarea>
+                        <!-- Botón de acción dentro del contenedor de Gastos -->
+                        <div class="form-actions" style="margin-top: 1.5rem;">
+                            <button type="submit" class="btn btn--primary" style="width: 100%;">💸 Registrar Gasto</button>
+                            <button type="button" id="limpiarForm" class="btn btn--secondary" style="width: 100%; margin-top: 0.5rem;">Limpiar Campos</button>
                         </div>
                     </div>
 
-                    <!-- Ingresos del Mes (al final para evitar confusiones) -->
-                    <div class="form-section" style="border-top: 2px solid #e5e7eb; padding-top: 1.5rem; margin-top: 1.5rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3 style="margin: 0;">💵 Ingresos del Mes (Opcional)</h3>
-                            <button type="button" id="btnAgregarIngreso" class="btn btn--primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                    <!-- CONTENEDOR 2: INGRESOS DEL MES -->
+                    <div class="ingresos-container" style="background: white; border: 2px solid #10b981; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
+                        <div class="form-section">
+                            <h3 style="color: #10b981; margin-bottom: 1rem;">💵 Ingresos del Mes (Opcional)</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="ingresoBase" class="form-label">Ingreso Principal</label>
+                                    <input type="number" id="ingresoBase" class="form-control" placeholder="$0" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ingresoExtra" class="form-label">Ingreso Extra</label>
+                                    <input type="number" id="ingresoExtra" class="form-control" placeholder="$0" min="0">
+                                </div>
+                            </div>
+                            <div id="ingresosAgregados" style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 0.5rem; display: none;">
+                                <p style="font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📊 Ingresos acumulados:</p>
+                                <p style="color: #6b7280; margin: 0;">
+                                    <strong>Total de ingresos agregados:</strong> <span id="totalIngresosAcumulados" style="color: #059669; font-weight: 700;">$0</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Botón de acción dentro del contenedor de Ingresos -->
+                        <div class="form-actions" style="margin-top: 1.5rem;">
+                            <button type="button" id="btnAgregarIngreso" class="btn btn--primary" style="width: 100%; background: linear-gradient(135deg, #10b981, #059669);">
                                 ➕ Agregar Ingreso
                             </button>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="ingresoBase" class="form-label">Ingreso Principal</label>
-                                <input type="number" id="ingresoBase" class="form-control" placeholder="$0" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label for="ingresoExtra" class="form-label">Ingreso Extra</label>
-                                <input type="number" id="ingresoExtra" class="form-control" placeholder="$0" min="0">
-                            </div>
-                        </div>
-                        <div id="ingresosAgregados" style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 0.5rem; display: none;">
-                            <p style="font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📊 Ingresos acumulados:</p>
-                            <p style="color: #6b7280; margin: 0;">
-                                <strong>Total de ingresos agregados:</strong> <span id="totalIngresosAcumulados" style="color: #059669; font-weight: 700;">$0</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn--primary">Registrar Gasto</button>
-                        <button type="button" id="limpiarForm" class="btn btn--secondary">Limpiar Campos</button>
                     </div>
                 </form>
             </div>

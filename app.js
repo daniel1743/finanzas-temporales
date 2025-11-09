@@ -2205,19 +2205,21 @@ async function syncDataNow(event) {
   });
 
   try {
+    // IMPORTANTE: Limpiar localStorage primero para forzar sincronización completa
+    localStorage.removeItem('finanzasAppData');
+    console.log('🧹 localStorage limpiado - forzando carga desde Firebase');
+
     // Recargar datos desde Firestore
     const firestoreData = await loadFromFirestore();
 
     if (firestoreData) {
-      // Actualizar datos en memoria
-      appData = {
-        ...appData,
-        ...firestoreData
-      };
+      // Actualizar datos en memoria (reemplazar completamente, no mezclar)
+      appData = firestoreData;
       window.appData = appData;
 
       // Guardar en localStorage como backup
       localStorage.setItem('finanzasAppData', JSON.stringify(appData));
+      console.log('✅ Datos sincronizados desde Firebase y guardados en localStorage');
 
       // Actualizar UI completa
       updateUserSelects();

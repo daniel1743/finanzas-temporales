@@ -2285,3 +2285,161 @@ window.openAccountModal = openAccountModal;
 window.closeAccountModal = closeAccountModal;
 window.handleLogout = handleLogout;
 window.syncDataNow = syncDataNow;
+
+// ============================================
+// BOTÓN SECRETO DE SINCRONIZACIÓN FORZADA
+// ============================================
+// Toca 5 veces el título para activar sincronización forzada
+(function setupSecretSync() {
+  let tapCount = 0;
+  let tapTimer = null;
+  let syncButton = null;
+
+  const titles = document.querySelectorAll('.app-title, .navbar-title, h1');
+
+  titles.forEach(title => {
+    title.addEventListener('click', () => {
+      tapCount++;
+
+      // Resetear contador después de 2 segundos de inactividad
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => {
+        tapCount = 0;
+      }, 2000);
+
+      // Si se tocó 5 veces, mostrar botón de sincronización
+      if (tapCount === 5) {
+        tapCount = 0; // Resetear
+        showSyncButton();
+      }
+    });
+  });
+
+  function showSyncButton() {
+    // Si ya existe, no crear otro
+    if (syncButton) {
+      syncButton.remove();
+    }
+
+    // Crear botón flotante
+    syncButton = document.createElement('div');
+    syncButton.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        z-index: 10000;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+      ">
+        <h3 style="margin: 0 0 15px 0; font-size: 20px;">🔄 Forzar Sincronización</h3>
+        <p style="margin: 0 0 20px 0; opacity: 0.9; font-size: 14px;">
+          Esto borrará los datos locales y descargará<br>los datos actualizados desde Firebase.
+        </p>
+        <button id="btnForceSyncYes" style="
+          background: white;
+          color: #667eea;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 16px;
+          cursor: pointer;
+          margin: 5px;
+          transition: all 0.3s;
+        ">✅ Sincronizar Ahora</button>
+        <button id="btnForceSyncNo" style="
+          background: rgba(255,255,255,0.2);
+          color: white;
+          border: 2px solid white;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 16px;
+          cursor: pointer;
+          margin: 5px;
+          transition: all 0.3s;
+        ">❌ Cancelar</button>
+      </div>
+    `;
+
+    document.body.appendChild(syncButton);
+
+    // Agregar estilos de animación
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Event listeners para los botones
+    document.getElementById('btnForceSyncYes').addEventListener('click', async () => {
+      try {
+        // Mostrar loading
+        syncButton.querySelector('div').innerHTML = `
+          <h3 style="margin: 0;">🔄 Sincronizando...</h3>
+          <p style="margin: 15px 0 0 0; opacity: 0.9;">Por favor espera...</p>
+        `;
+
+        // Limpiar localStorage
+        localStorage.removeItem('finanzasAppData');
+        console.log('🧹 localStorage limpiado');
+
+        // Forzar recarga desde Firebase
+        await loadAppData();
+
+        // Actualizar UI
+        updateUI();
+
+        // Mostrar éxito
+        syncButton.querySelector('div').innerHTML = `
+          <h3 style="margin: 0; color: #4CAF50;">✅ Sincronización Exitosa</h3>
+          <p style="margin: 15px 0 0 0; opacity: 0.9;">Datos actualizados desde Firebase</p>
+        `;
+
+        showToast('✅ Datos sincronizados correctamente', 'success');
+
+        // Cerrar después de 2 segundos
+        setTimeout(() => {
+          syncButton.remove();
+          syncButton = null;
+        }, 2000);
+
+      } catch (error) {
+        console.error('Error en sincronización forzada:', error);
+
+        syncButton.querySelector('div').innerHTML = `
+          <h3 style="margin: 0; color: #f44336;">❌ Error</h3>
+          <p style="margin: 15px 0 0 0; opacity: 0.9;">${error.message}</p>
+          <button onclick="location.reload()" style="
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+          ">🔄 Recargar Página</button>
+        `;
+
+        showToast('❌ Error al sincronizar. Intenta recargar la página.', 'error');
+      }
+    });
+
+    document.getElementById('btnForceSyncNo').addEventListener('click', () => {
+      syncButton.remove();
+      syncButton = null;
+    });
+  }
+})();
